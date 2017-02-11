@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KeepTabs Options</title>
+    <style>
+        /* TODO: Add any necessary styling. */
+    </style>
+</head>
+
+<body>
+    <h1>Daily tasks</h1>
+    <p>List here tasks that you need to complete every day, but don't want to
+    create calendar events for. Their <strong>duration</strong> will be counted
+    for each day when calculating free time. If a daily task's
+    <strong>name</strong> is contained in the title of a scheduled event, the
+    duration of the daily task will not be counted for the day of that event.
+    (E.g. when you schedule "Lunch with Bill" your "lunch" daily task duration
+    won't be counted that day.) When computing free time for today, if the
+    current time is past a daily task's <strong>completed by</strong> time, the
+    daily task's duration won't be counted.</p>
+    <form id="options">
+    <table id="daily_tasks"><tbody>
+        <tr>
+            <th>Name</th>
+            <th>Duration (minutes)</th>
+            <th>Completed by</th>
+        </tr>
+    </tbody></table>
+    <button id="add_daily_task">Add daily task</button>
+
+    <h1>Calculation options</h1>
+    <p><strong>Leeway</strong> is the ideal amount of unallocated time you want
+    per day. <strong>Short event duration</strong> is the duration you want
+    short (&le; 40 minutes) events to be approximated as.* <strong>Transition
+    time</strong> is the amount of allocated time automatically added for each
+    regular (&gt; 40 minutes) event. <em>Specify all amounts in
+    minutes.</em></p>
+    <p><small>* The exact duration can't be computed because the event's box is
+    so small that the end time doesn't show. This hack will be fixed in the
+    future.</small></p>
+    <table id="calculation_options"><tbody>
+        <tr>
+            <td>Start of day: </td>
+            <td><input required type="time" name="start_of_day"></td>
+        </tr>
+        <tr>
+            <td>End of day: </td>
+            <td><input required type="time" name="end_of_day"></td>
+        </tr>
+        <tr>
+            <td>Leeway: </td>
+            <td><input required type="number" name="leeway" min="0"
+                    max="1440"></td>
+        </tr>
+        <tr>
+            <td>Short event duration: </td>
+            <td><input required type="number" name="short_event_duration"
+                    min="0" max="40"></td>
+        </tr>
+        <tr>
+            <td>Transition time: </td>
+            <td><input required type="number" name="transition_time" min="0"
+                    max="1440"></td>
+        </tr>
+    </tbody></table>
+
+    <h1>Other options</h1>
+    <div>
+        <input type="checkbox" name="blink">
+        <label class="checkbox">Blink days with negative free time</label>
+    </div>
+    <h4>Customize shade gradient color (specify maximum shade):</h4>
+    <label>R: </label>
+    <input required class="pixel" type="number" name="color_r" min="0"
+            max="255">
+    <label>G: </label>
+    <input required class="pixel" type="number" name="color_g" min="0"
+            max="255">
+    <label>B: </label>
+    <input required class="pixel" type="number" name="color_b" min="0"
+            max="255">
+
+    <input id="save" type="submit" value="Save all">
+    </form>
+
+    <script src="jquery-3.1.1.slim.min.js"></script>
+    <!--TODO: Write JS<script src="options.js"></script>-->
+</body>
+</html>
