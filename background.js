@@ -62,10 +62,13 @@ chrome.runtime.onMessage.addListener(
       }
     }
 
-    url = mappings.hotkey;
+    url = mappings[hotkey].domain;
     console.log(mappings);
+    console.log(url);
     if(url){
       checked_new_tab(url, isLower);
+      console.log("hi pls");
+      //console.log(url);
     }
 
   }

@@ -40,9 +40,9 @@ function getHotkeyEntrys() {
         var hotkey = jqThis.find(INPUT_HOTKEY_SELECTOR).val();
         var deduplicate = jqThis.find(INPUT_CHECK_SELECTOR).val();
         if (deduplicate === "on") {
-            deduplicate = 1;
+            deduplicate = true;
         } else {
-            deduplicate = 0;
+            deduplicate = false;
         }
         hotkeys.push({
             domain: domain,
@@ -59,7 +59,8 @@ function restoreHotkeyEntrys(hotkeys) {
         var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
         jqHotkeyEntryRow.find(INPUT_DOMAIN_SELECTOR).val(hotkeys[i].domain);
         jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(hotkeys[i].hotkey);
-        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).val(hotkeys[i].deduplicate);
+        var deduplicate = hotkeys[i].deduplicate ? "on" : "off";
+        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).val(deduplicate);
     }
 }
 
