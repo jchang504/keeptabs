@@ -35,7 +35,7 @@ chrome.runtime.onMessage.addListener(
     console.log(hotkey);
     var isLower = true;
     var alpha_regex = new RegExp('/^[A-Z]$')
-    for c of hotkey{
+    for (c of hotkey) {
       var check_value = alpha_regex.exec(c);
       if(check_value){
         isUpper = false;
