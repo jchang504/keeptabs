@@ -3,6 +3,9 @@ var filtered_tabs;
 function select_first(){
   if(filtered_tabs && filtered_tabs.length > 0){
     var tab = filtered_tabs[0];
+    chrome.tabs.getCurrent(function(curr_tab){
+      chrome.tabs.remove(curr_tab.id);
+    });
     chrome.windows.update(parseInt(tab.windowId), {"focused":true});
     chrome.tabs.update(parseInt(tab.id), {"active":true});
   }
