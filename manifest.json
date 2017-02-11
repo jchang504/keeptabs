@@ -5,7 +5,7 @@
     "version_name": "0.0.0",
     "description": "TODO: Insert description",
     "permissions": [
-        // TODO: Add permissions here.
+      "tabs"
     ],
     "options_ui": {
         "page": "options.html",
