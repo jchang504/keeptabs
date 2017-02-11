@@ -8,6 +8,12 @@
       "tabs",
       "storage"
     ],
+    "background": {
+      "scripts": ["jquery-3.1.1.slim.min.js","tabs.js"]
+    },
+    "browser_action": {
+          "default_icon": "icon.png"
+    },
     "options_ui": {
         "page": "options.html",
         "chrome_style": true
