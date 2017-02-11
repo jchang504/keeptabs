@@ -87,31 +87,31 @@ function get_mapped_domains() {
 
 get_mapped_domains()
 
+var NAV_LEFT_SYMBOL = '[';
+var NAV_RIGHT_SYMBOL = ']';
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
       var hotkey = request.hotkey;
       console.log("Received hotkey: " + hotkey);
 
-      if(hotkey == "["){
+      if(hotkey == NAV_LEFT_SYMBOL){
           go_left_right(true);
       }
-      else if(hotkey == "]"){
+      else if(hotkey == NAV_RIGHT_SYMBOL){
           go_left_right(false);
       }
       else{
-          var isLower = true;
-          var alpha_regex = new RegExp('/^[A-Z]$')
-          for (c of hotkey) {
-              var check_value = alpha_regex.exec(c);
-              if(check_value){
-                  isLower = false;
-                  break;
-              }
-          }
+          var normalized = hotkey.toLowerCase();
+          var overrideDeduplicate = hotkey != normalized;
 
-          url = mappings[hotkey].domain;
-          if (url) {
-              checked_new_tab(url, isLower);
+          if (normalized in mappings) {
+              var hotkey_info = mappings[normalized];
+              domain = hotkey_info.domain;
+              if (domain) {
+                  checked_new_tab(domain, hotkey_info.deduplicate &&
+                        !overrideDeduplicate);
+              }
           }
       }
   }
