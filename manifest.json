@@ -5,7 +5,8 @@
     "version_name": "0.0.0",
     "description": "TODO: Insert description",
     "permissions": [
-      "tabs"
+      "tabs",
+      "storage"
     ],
     "background": {
       "scripts": ["jquery-3.1.1.slim.min.js","tabs.js"]
