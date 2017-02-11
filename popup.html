@@ -3,6 +3,14 @@
 
 <head>
   <title>Set Page Color Popup</title>
+  <style>
+    html {
+        min-width: 400px;
+    }
+    #results tr:first-child td {
+        background-color: #cfe3e8;
+    }
+  </style>
   <script src="jquery-3.1.1.slim.min.js"></script>
   <script src="fuse.js"></script>
   <script src="popup.js"></script>
@@ -20,7 +28,7 @@
         <label for="fuzzy_input" class="right inline">Search</label>
       </div>
       <div class="small-9 columns">
-        <input type="text" id="fuzzy_input" placeholder="facebook.com">
+        <input autofocus type="text" id="fuzzy_input" placeholder="facebook.com">
       </div>
     </div>
   </div>
