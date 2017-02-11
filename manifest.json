@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
     "name": "KeepTabs",
-    "version": "0.0.0",
-    "version_name": "0.0.0",
+    "version": "1.0.0",
+    "version_name": "Initial Release",
     "description": "Keep tabs on your tabs.",
     "permissions": [
       "tabs",
