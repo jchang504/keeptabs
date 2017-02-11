@@ -1,0 +1,11 @@
+KeepTabs 
+
+KeepTabs is the only tab manager you'll need! 
+
+Find and create the tabs you need quicker than ever with KeepTabs. 
+
+You can assign your own hotkey shortcuts to websites you frequently visit in the options page. Start with two commas then your hotkey to activate your shortcut. If you already have a tab with that website open, pressing the hotkey will redirect you to that tab. If not, then it will create a new tab with the website you want. If you want to create a new tab even though you have one open, then just press shift along with your hotkey to do so.
+
+Don't have a hotkey assigned to a tab you want to go to? Click the KeepTabs button on your extension bar to search through your tabs. Begin typing to find the tab that you're looking for, and click on the list to bring you there.
+
+You can also navigate through your tabs quickly to find the tab you're looking for by pressing the left and right brackets on your keyboard.
