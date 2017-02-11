@@ -12,7 +12,8 @@
       "scripts": ["jquery-3.1.1.slim.min.js","tabs.js"]
     },
     "browser_action": {
-          "default_icon": "icons/icon48.png"
+          "default_icon": "icons/icon48.png",
+          "default_popup": "popup.html"
     },
     "content_scripts": [
       {
