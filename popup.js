@@ -1,10 +1,24 @@
+var filtered_tabs;
+
+function select_first(){
+  if(filtered_tabs && filtered_tabs.length > 0){
+    var tab = filtered_tabs[0];
+    chrome.windows.update(parseInt(tab.windowId), {"focused":true});
+    chrome.tabs.update(parseInt(tab.id), {"active":true});
+  }
+}
+
+
 function populate(){
   chrome.tabs.query({}, function(tabs){
+  filtered_tabs = tabs;
+
     var fuzzy_input = $("#fuzzy_input").val();
     if(fuzzy_input){
       var fuse_options = {keys: ["url", "title"]};
       var fuse = new Fuse(tabs, fuse_options);
       tabs = fuse.search(fuzzy_input);
+      filtered_tabs = tabs;
     }
 
     var id_prefix = "tab-";
@@ -49,4 +63,10 @@ function populate(){
 $(document).ready(function(){
   populate();
   $("#fuzzy_input").on("input", populate);
+  $('#fuzzy_input').keypress(function(e){
+    if(e.which == 13) {
+      select_first();
+    }
+  });
+
 });
