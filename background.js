@@ -10,7 +10,7 @@ function checked_new_tab(url, deduplicate){
 
     var domain_regex = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)', 'i');
     var curr_domain = domain_regex.exec(url)[1];
-    if(dup){
+    if(deduplicate){
       for (tab of tabs){
         var tab_url = tab.url;
         var tab_domain = domain_regex.exec(tab_url)[1];
@@ -65,6 +65,25 @@ function go_left_right(goLeft) {
 
 var mappings = {};
 
+function get_mapped_domains() {
+  chrome.storage.sync.get({
+    hotkeys:[]
+  }, function(items){
+
+    for (hotkey_info of items.hotkeys){
+      var hotkey_map = {};
+      var hotkey = hotkey_info.hotkey;
+      hotkey_map.domain = hotkey_info.domain;
+      hotkey_map.deduplicate = hotkey_info.deduplicate;
+
+      mappings[hotkey] = hotkey_map;
+
+    }
+  });
+}
+
+get_mapped_domains()
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     var hotkey = request.hotkey;
@@ -85,10 +104,13 @@ chrome.runtime.onMessage.addListener(
         }
       }
 
-      url = mappings.hotkey;
-      if(url){
-        checked_new_tab(url, isLower);
-      }
+    url = mappings[hotkey].domain;
+    console.log(mappings);
+    console.log(url);
+    if(url){
+      checked_new_tab(url, isLower);
+      console.log("hi pls");
+      //console.log(url);
     }
   }
 );
