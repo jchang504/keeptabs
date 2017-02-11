@@ -4,7 +4,6 @@ var HOTKEY_ENTRY_LAST_ROW_SELECTOR = '#hotkey_entry tr:last-child';
 var HOTKEY_ENTRY_DELETE_SELECTOR = 'button.delete';
 var INPUT_SELECTOR = 'input';
 var INPUT_TEXT_SELECTOR = 'input[type="text"]';
-var INPUT_CHECK_SELECTOR = 'input[type="checkbox"]';
 var INPUT_DOMAIN_SELECTOR = 'input[name="domain"]';
 var INPUT_HOTKEY_SELECTOR = 'input[name="hotkey"]';
 var INPUT_DEDUPLICATE_SELECTOR = 'input[name="deduplicate"]';
@@ -38,12 +37,8 @@ function getHotkeyEntrys() {
         var jqThis = $(this);
         var domain = jqThis.find(INPUT_DOMAIN_SELECTOR).val();
         var hotkey = jqThis.find(INPUT_HOTKEY_SELECTOR).val();
-        var deduplicate = jqThis.find(INPUT_CHECK_SELECTOR).val();
-        if (deduplicate === "on") {
-            deduplicate = true;
-        } else {
-            deduplicate = false;
-        }
+        var deduplicate = jqThis.find(INPUT_DEDUPLICATE_SELECTOR).is(
+                ':checked');
         hotkeys.push({
             domain: domain,
             hotkey: hotkey,
@@ -59,14 +54,15 @@ function restoreHotkeyEntrys(hotkeys) {
         var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
         jqHotkeyEntryRow.find(INPUT_DOMAIN_SELECTOR).val(hotkeys[i].domain);
         jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(hotkeys[i].hotkey);
-        var deduplicate = hotkeys[i].deduplicate ? "on" : "off";
-        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).val(deduplicate);
+        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).prop('checked',
+                hotkeys[i].deduplicate);
     }
 }
 
 // Saves options to chrome.storage.sync.
 function saveOptions() {
     var hotkeys = getHotkeyEntrys();
+    console.log(hotkeys);
     chrome.storage.sync.set({
         hotkeys: hotkeys
     }, function() {
@@ -82,6 +78,7 @@ function restoreOptions() {
     chrome.storage.sync.get({
         hotkeys: []
     }, function(items) {
+        console.log(items.hotkeys);
         restoreHotkeyEntrys(items.hotkeys);
     });
 }

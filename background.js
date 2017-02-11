@@ -87,15 +87,18 @@ function get_mapped_domains() {
 
 get_mapped_domains()
 
+var NAV_LEFT_SYMBOL = '[';
+var NAV_RIGHT_SYMBOL = ']';
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
       var hotkey = request.hotkey;
       console.log("Received hotkey: " + hotkey);
 
-      if(hotkey == "["){
+      if(hotkey == NAV_LEFT_SYMBOL){
           go_left_right(true);
       }
-      else if(hotkey == "]"){
+      else if(hotkey == NAV_RIGHT_SYMBOL){
           go_left_right(false);
       }
       else{
@@ -111,7 +114,7 @@ chrome.runtime.onMessage.addListener(
 
           url = mappings[hotkey].domain;
           if (url) {
-              checked_new_tab(url, isLower);
+              checked_new_tab(url, mappings[hotkey].deduplicate && isLower);
           }
       }
   }
