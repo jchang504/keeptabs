@@ -29,6 +29,25 @@ function checked_new_tab(url, deduplicate){
 
 var mappings = {};
 
+function get_mapped_domains() {
+  chrome.storage.sync.get({
+    hotkeys:[]
+  }, function(items){
+
+    for (hotkey_info of items.hotkeys){
+      var hotkey_map = {};
+      var hotkey = hotkey_info.hotkey;
+      hotkey_map.domain = hotkey_info.domain;
+      hotkey_map.deduplicate = hotkey_info.deduplicate;
+
+      mappings[hotkey] = hotkey_map;
+
+    }
+  });
+}
+
+get_mapped_domains()
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     var hotkey = request.hotkey;
@@ -44,6 +63,7 @@ chrome.runtime.onMessage.addListener(
     }
 
     url = mappings.hotkey;
+    console.log(mappings);
     if(url){
       checked_new_tab(url, isLower);
     }

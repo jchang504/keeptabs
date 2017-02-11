@@ -33,36 +33,41 @@ function addHotkeyEntry() {
 }
 
 function getHotkeyEntrys() {
-    var hotKeys = [];
+    var hotkeys = [];
     $(HOTKEY_ENTRY_ROWS_SELECTOR).each(function() {
         var jqThis = $(this);
         var domain = jqThis.find(INPUT_DOMAIN_SELECTOR).val();
         var hotkey = jqThis.find(INPUT_HOTKEY_SELECTOR).val();
         var deduplicate = jqThis.find(INPUT_CHECK_SELECTOR).val();
-        hotKeys.push({
+        if (deduplicate === "on") {
+            deduplicate = 1;
+        } else {
+            deduplicate = 0;
+        }
+        hotkeys.push({
             domain: domain,
             hotkey: hotkey,
             deduplicate: deduplicate
         });
     });
-    return hotKeys;
+    return hotkeys;
 }
 
-function restoreHotkeyEntrys(hotKeys) {
-    for (var i = 0; i < hotKeys.length; i++) {
+function restoreHotkeyEntrys(hotkeys) {
+    for (var i = 0; i < hotkeys.length; i++) {
         addHotkeyEntry();
         var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
-        jqHotkeyEntryRow.find(INPUT_DOMAIN_SELECTOR).val(hotKeys[i].domain);
-        jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(hotKeys[i].hotkey);
-        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).val(hotKeys[i].deduplicate);
+        jqHotkeyEntryRow.find(INPUT_DOMAIN_SELECTOR).val(hotkeys[i].domain);
+        jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(hotkeys[i].hotkey);
+        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).val(hotkeys[i].deduplicate);
     }
 }
 
 // Saves options to chrome.storage.sync.
 function saveOptions() {
-    var hotKeys = getHotkeyEntrys();
+    var hotkeys = getHotkeyEntrys();
     chrome.storage.sync.set({
-        hotKeys: hotKeys
+        hotkeys: hotkeys
     }, function() {
         // Disable save button to indicate that options are saved.
         $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
@@ -74,9 +79,9 @@ function saveOptions() {
 function restoreOptions() {
     // Default values.
     chrome.storage.sync.get({
-        hotKeys: []
+        hotkeys: []
     }, function(items) {
-        restoreHotkeyEntrys(items.hotKeys);
+        restoreHotkeyEntrys(items.hotkeys);
     });
 }
 
