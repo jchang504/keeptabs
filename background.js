@@ -10,7 +10,7 @@ function checked_new_tab(url, deduplicate){
 
     var domain_regex = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)', 'i');
     var curr_domain = domain_regex.exec(url)[1];
-    if(dup){
+    if(deduplicate){
       for (tab of tabs){
         var tab_url = tab.url;
         var tab_domain = domain_regex.exec(tab_url)[1];
