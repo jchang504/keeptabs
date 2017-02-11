@@ -1,42 +1,52 @@
 function populate(){
   chrome.tabs.query({}, function(tabs){
-      var id_prefix = "tab-";
-      var table = document.getElementById('results');
+    var fuzzy_input = $("#fuzzy_input").val();
+    if(fuzzy_input){
+      var fuse_options = {keys: ["url", "title"]};
+      var fuse = new Fuse(tabs, fuse_options);
+      tabs = fuse.search(fuzzy_input);
+    }
 
-      table.innerHTML = "";
-      
-      for (var i = 0; i < tabs.length; i++){
+    var id_prefix = "tab-";
+    var table = document.getElementById('results');
 
-        var tab = tabs[i];
-        var id = id_prefix + i;
-        table.innerHTML += '<tr><td id ="' + id + '" tab_id="' + tab.id + '"'
-          + ' window_id="' + tab.windowId + '"'
-          + '>' + tab.url + "</td></tr>";
-       
+    table.innerHTML = "";
+    
+    for (var i = 0; i < tabs.length; i++){
+
+      var tab = tabs[i];
+      var id = id_prefix + i;
+      table.innerHTML += '<tr><td id ="' + id + '" tab_id="' + tab.id + '"'
+        + ' window_id="' + tab.windowId + '"'
+        + '>' + tab.url + "</td></tr>";
+     
+    }
+
+    $(document).ready(function(){
+
+      for(var j = 0; j < tabs.length; j++){
+
+        var id = id_prefix + j;
+        var jqElem = $('#' + id);
+        var tab = tabs[j];
+        jqElem.click(function(event){
+          var target = $('#' + event.target.id);
+          console.log(event.target);
+          chrome.windows.update(parseInt(target.attr("window_id")), {"focused":true});
+          chrome.tabs.update(parseInt(target.attr("tab_id")), {"active":true});
+          window.close();
+        });
+
       }
 
-      $(document).ready(function(){
-
-        for(var j = 0; j < tabs.length; j++){
-
-          var id = id_prefix + j;
-          var jqElem = $('#' + id);
-          var tab = tabs[j];
-          jqElem.click(function(event){
-            var target = $('#' + event.target.id);
-            console.log(event.target);
-            chrome.windows.update(parseInt(target.attr("window_id")), {"focused":true});
-            chrome.tabs.update(parseInt(target.attr("tab_id")), {"active":true});
-            window.close();
-          });
-
-        }
-
-      });
+    });
   });
 
 }
 
 
 
-$(document).ready(populate);
+$(document).ready(function(){
+  populate();
+  $("#fuzzy_input").on("input", populate);
+});

@@ -4,6 +4,7 @@
 <head>
   <title>Set Page Color Popup</title>
   <script src="jquery-3.1.1.slim.min.js"></script>
+  <script src="bower_components/fuse.js/src/fuse.js"></script>
   <script src="popup.js"></script>
   <!-- Compressed CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css">
@@ -16,10 +17,10 @@
   <div class="small-8 columns">
     <div class="row">
       <div class="small-3 columns">
-        <label for="right-label" class="right inline">Search</label>
+        <label for="fuzzy_input" class="right inline">Search</label>
       </div>
       <div class="small-9 columns">
-        <input type="text" id="right-label" placeholder="Inline Text Input">
+        <input type="text" id="fuzzy_input" placeholder="facebook.com">
       </div>
     </div>
   </div>
