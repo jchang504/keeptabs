@@ -102,19 +102,16 @@ chrome.runtime.onMessage.addListener(
           go_left_right(false);
       }
       else{
-          var isLower = true;
-          var alpha_regex = new RegExp('/^[A-Z]$')
-          for (c of hotkey) {
-              var check_value = alpha_regex.exec(c);
-              if(check_value){
-                  isLower = false;
-                  break;
-              }
-          }
+          var normalized = hotkey.toLowerCase();
+          var overrideDeduplicate = hotkey != normalized;
 
-          url = mappings[hotkey].domain;
-          if (url) {
-              checked_new_tab(url, mappings[hotkey].deduplicate && isLower);
+          if (normalized in mappings) {
+              var hotkey_info = mappings[normalized];
+              domain = hotkey_info.domain;
+              if (domain) {
+                  checked_new_tab(domain, hotkey_info.deduplicate &&
+                        !overrideDeduplicate);
+              }
           }
       }
   }
