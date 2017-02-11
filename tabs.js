@@ -27,11 +27,26 @@ function checked_new_tab(url, check_for_dup){
 
 }
 
+var mappings = {};
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    console.log("from a content script:" + sender.tab.url + "from the extension");
     var key = request.key;
+    console.log(key);
+    var isLower = true;
+    var alpha_regex = new RegExp('/^[A-Z]$')
+    for c of key{
+      var check_value = alpha_regex.exec(c);
+      if(check_value){
+        isUpper = false;
+        break;
+      }
+    }
+
+    url = mappings.key;
+    if(url){
+      checked_new_tab(url, isLower);
+    }
 
   }
 );
