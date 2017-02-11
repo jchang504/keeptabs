@@ -50,12 +50,19 @@ $(document).ready(function() {
                         }
                         hotkey += String.fromCharCode(asciiCode);
                     }
-                    // Capture left/right navigation hotkeys.
+                    // Capture left/right navigation hotkeys. Send them right
+                    // away so that the user can repeatedly move left or right
+                    // without releasing the hold key.
+                    // TODO: This sometimes gets caught when you move to a tab
+                    // where an input box is focused; not totally sure why as
+                    // it should still be getting the keydown for the hold key.
                     else if (e.which == NAV_LEFT) {
-                        hotkey = NAV_LEFT_SYMBOL;
+                        sendHotkeyMessage(NAV_LEFT_SYMBOL);
+                        hotkey = '';
                     }
                     else if (e.which == NAV_RIGHT) {
-                        hotkey = NAV_RIGHT_SYMBOL;
+                        sendHotkeyMessage(NAV_RIGHT_SYMBOL);
+                        hotkey = '';
                     }
                     else if (e.which == TAB_SEARCH) {
                         hotkey = TAB_SEARCH_SYMBOL;
