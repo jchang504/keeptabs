@@ -27,26 +27,68 @@ function checked_new_tab(url, deduplicate){
 
 }
 
+
+
+function go_left_right(goLeft) {
+    chrome.tabs.query({}, function(tabs) {
+
+      var curr_tab;
+      for (tab of tabs){
+          if(tab.active){
+            curr_tab = tab;
+            break;
+          }
+      }
+
+      var next_tab;
+      var length = tabs.length;
+      if(goLeft){
+        if(curr_tab.index == 0){
+            next_tab = tabs[length-1];
+        }else{
+            next_tab = tabs[curr_tab.index - 1];
+        }
+      }else{
+        if(curr_tab.index == length - 1){
+            next_tab = tabs[0];
+        }else{
+            next_tab = tabs[curr_tab.index + 1];
+        }
+      }
+      chrome.tabs.update(next_tab.id, {"active":true});
+    });
+}
+
+
+
+
+
 var mappings = {};
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     var hotkey = request.hotkey;
     console.log(hotkey);
-    var isLower = true;
-    var alpha_regex = new RegExp('/^[A-Z]$')
-    for (c of hotkey) {
-      var check_value = alpha_regex.exec(c);
-      if(check_value){
-        isUpper = false;
-        break;
+
+    if(hotkey == "["){
+      go_left_right(true);
+    }else if(hotkey == "]"){
+      go_left_right(false);
+    }else{
+      var isLower = true;
+      var alpha_regex = new RegExp('/^[A-Z]$')
+      for (c of hotkey) {
+        var check_value = alpha_regex.exec(c);
+        if(check_value){
+          isUpper = false;
+          break;
+        }
+      }
+
+      url = mappings.hotkey;
+      if(url){
+        checked_new_tab(url, isLower);
       }
     }
-
-    url = mappings.hotkey;
-    if(url){
-      checked_new_tab(url, isLower);
-    }
-
   }
 );
