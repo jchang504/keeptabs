@@ -16,8 +16,6 @@ function checked_new_tab(url, deduplicate){
         var tab_domain = domain_regex.exec(tab_url)[1];
         if (target_domain == tab_domain){
           var tab_id = tab.id;
-          // TODO: For multi-window, it makes the matching tab the active tab
-          // of its window. Need to also switch focus to that window.
           console.log("Switch active tab to: " + tab_url);
           chrome.tabs.update(tab_id, {"active":true});
           chrome.windows.update(tab.windowId, {"focused":true});
@@ -85,6 +83,9 @@ function get_mapped_domains() {
   });
 }
 
+// TODO: Change this to get the hotkeys every time we receive one, so that user
+// does not have to reload the background script after editing options for
+// changes to take effect.
 get_mapped_domains()
 
 var NAV_LEFT_SYMBOL = '[';
