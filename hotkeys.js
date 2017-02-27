@@ -6,7 +6,7 @@ function sendHotkeyMessage(hotkey) {
 // TODO: Will waiting until document ready cause too much delay before the user
 // can start using the hotkeys?
 $(document).ready(function() {
-    var HOTKEY_HOLD_KEY = 32; // Spacebar.
+    var HOTKEY_HOLD_KEY = 27; // Escape.
     var SHIFT = 16;
     // Hotkeys for navigating to left or right tab.
     var NAV_LEFT = 219;
@@ -21,19 +21,13 @@ $(document).ready(function() {
     var hotkey = '';
     $(document).keydown(function(e) {
         switch (e.which) {
-            // When spacebar pressed, block text entry and wait for hotkey.
+            // When hold key pressed, block text entry and wait for hotkey.
             case HOTKEY_HOLD_KEY:
                 if (!holding) {
                     console.log("Holding for hotkey...");
                     holding = true;
                 }
-                // TODO: Figure out how to block spacebar entry ONLY when
-                // spacebar is held and a hotkey is typed (i.e. allow normal
-                // text space input when it's pressed and released without
-                // typing a hotkey. Or at least block further spaces being
-                // entered when the last key pressed within ~100ms or whatever
-                // the repeat key delay is was spacebar.
-                //e.preventDefault();
+                e.preventDefault();
                 break;
             // Need to manually implement capitalization with shift since we're
             // intercepting keys.
