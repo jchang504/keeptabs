@@ -1,15 +1,14 @@
 var HOTKEY_HOLD_KEY = 27; // Escape.
-var SHIFT = 16;
 // Hotkeys for navigating to left or right tab.
-var NAV_LEFT = 219;
-var NAV_RIGHT = 221;
-var TAB_SEARCH = 186;
+var NAV_LEFT_KEY_CODE = 91;
+var NAV_RIGHT_KEY_CODE = 93;
+// Hotkey for searching tabs.
+var TAB_SEARCH_KEY_CODE = 59;
 var NAV_LEFT_SYMBOL = '[';
 var NAV_RIGHT_SYMBOL = ']';
 var TAB_SEARCH_SYMBOL = ';';
 
 var holding = false;
-var shift = false;
 var hotkey = '';
 
 function sendHotkeyMessage(hotkey) {
@@ -17,83 +16,66 @@ function sendHotkeyMessage(hotkey) {
     chrome.runtime.sendMessage({hotkey: hotkey});
 }
 
-function keydownHandler(e) {
-    console.log("keydownHandler");
-    switch (e.which) {
-        // When hold key pressed, block text entry and wait for hotkey.
-        case HOTKEY_HOLD_KEY:
-            if (!holding) {
-                console.log("Holding for hotkey...");
-                holding = true;
-            }
-            e.stopPropagation();
-            break;
-        // Need to manually implement capitalization with shift since we're
-        // intercepting keys.
-        case SHIFT:
-            shift = true;
-            break;
-        default:
-            if (holding) {
-                // Capture a-z.
-                if (65 <= e.which && e.which <= 90) {
-                    var asciiCode = e.which;
-                    if (!shift) {
-                        asciiCode += 32;
-                    }
-                    hotkey += String.fromCharCode(asciiCode);
-                }
-                // Capture left/right navigation hotkeys. Send them right
-                // away so that the user can repeatedly move left or right
-                // without releasing the hold key.
-                // TODO: This sometimes gets caught when you move to a tab
-                // where an input box is focused; not totally sure why as
-                // it should still be getting the keydown for the hold key.
-                else if (e.which == NAV_LEFT) {
-                    sendHotkeyMessage(NAV_LEFT_SYMBOL);
-                    hotkey = '';
-                }
-                else if (e.which == NAV_RIGHT) {
-                    sendHotkeyMessage(NAV_RIGHT_SYMBOL);
-                    hotkey = '';
-                }
-                else if (e.which == TAB_SEARCH) {
-                    hotkey = TAB_SEARCH_SYMBOL;
-                }
-                e.stopPropagation();
-                e.preventDefault();
-            }
-            break;
+function holdDownHandler(e) {
+    console.log("holdDownHandler");
+    // When hold key pressed, block text entry and wait for hotkey.
+    if (e.which == HOTKEY_HOLD_KEY) {
+        if (!holding) {
+            console.log("Holding for hotkey...");
+            holding = true;
+        }
+        e.stopPropagation();
     }
 }
 
-function keyupHandler(e) {
-    console.log("keyupHandler");
-    switch (e.which) {
-        // When spacebar released, unblock text entry and send any hotkey
-        // entered.
-        // TODO: Fix false positives sending a hotkey when spacebar is held
-        // while typing very fast (especially " a ").
-        case HOTKEY_HOLD_KEY:
-            if (hotkey.length > 0) {
-                sendHotkeyMessage(hotkey);
-                hotkey = '';
-            }
-            e.stopPropagation();
-            console.log("Released for hotkey.");
-            holding = false;
-            break;
-        // Need to manually implement capitalization with shift since we're
-        // intercepting keys.
-        case SHIFT:
-            shift = false;
-            break;
+function holdUpHandler(e) {
+    console.log("holdUpHandler");
+    // When hold key released, unblock text entry and send any hotkey entered.
+    if (e.which == HOTKEY_HOLD_KEY) {
+        if (hotkey.length > 0) {
+            sendHotkeyMessage(hotkey);
+            hotkey = '';
+        }
+        e.stopPropagation();
+        console.log("Released for hotkey.");
+        holding = false;
+    }
+}
+
+function keypressHandler(e) {
+    if (holding) {
+        // Capture [A-Za-z].
+        if (65 <= e.keyCode && e.keyCode <= 90 || 
+            97 <= e.keyCode && e.keyCode <= 122) {
+            hotkey += String.fromCharCode(e.keyCode);
+        }
+        // Capture left/right navigation and tab search hotkeys. Send them
+        // immediately so that the user can repeatedly move left or right
+        // without releasing the hold key.
+        // TODO: This sometimes gets caught when you move to a tab
+        // where an input box is focused; not totally sure why as
+        // it should still be getting the keydown for the hold key.
+        else if (e.keyCode == NAV_LEFT_KEY_CODE) {
+            sendHotkeyMessage(NAV_LEFT_SYMBOL);
+            hotkey = '';
+        }
+        else if (e.keyCode == NAV_RIGHT_KEY_CODE) {
+            sendHotkeyMessage(NAV_RIGHT_SYMBOL);
+            hotkey = '';
+        }
+        else if (e.keyCode == TAB_SEARCH_KEY_CODE) {
+            sendHotkeyMessage(TAB_SEARCH_SYMBOL);
+            hotkey = '';
+        }
+        e.stopPropagation();
+        e.preventDefault();
     }
 }
 
 // TODO: Will waiting until document ready cause too much delay before the user
 // can start using the hotkeys?
 $(document).ready(function() {
-    $(document).get(0).addEventListener("keydown", keydownHandler, true);
-    $(document).get(0).addEventListener("keyup", keyupHandler, true);
+    $(document).get(0).addEventListener("keydown", holdDownHandler, true);
+    $(document).get(0).addEventListener("keyup", holdUpHandler, true);
+    $(document).get(0).addEventListener("keypress", keypressHandler, true);
 });

@@ -13,5 +13,3 @@
 ## P2
 
 ## P3
-    - Use keypress instead of keydown for letter keys and removal manual
-      implementation of Shift
