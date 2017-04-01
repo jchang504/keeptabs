@@ -16,20 +16,22 @@ function sendHotkeyMessage(hotkey) {
     chrome.runtime.sendMessage({hotkey: hotkey});
 }
 
-function holdDownHandler(e) {
-    console.log("holdDownHandler");
+function keydownHandler(e) {
+    console.log("keydownHandler");
     // When hold key pressed, block text entry and wait for hotkey.
     if (e.which == HOTKEY_HOLD_KEY) {
         if (!holding) {
             console.log("Holding for hotkey...");
             holding = true;
         }
+    }
+    if (holding) {
         e.stopPropagation();
     }
 }
 
-function holdUpHandler(e) {
-    console.log("holdUpHandler");
+function keyupHandler(e) {
+    console.log("keyupHandler");
     // When hold key released, unblock text entry and send any hotkey entered.
     if (e.which == HOTKEY_HOLD_KEY) {
         if (hotkey.length > 0) {
@@ -75,7 +77,7 @@ function keypressHandler(e) {
 // TODO: Will waiting until document ready cause too much delay before the user
 // can start using the hotkeys?
 $(document).ready(function() {
-    $(document).get(0).addEventListener("keydown", holdDownHandler, true);
-    $(document).get(0).addEventListener("keyup", holdUpHandler, true);
+    $(document).get(0).addEventListener("keydown", keydownHandler, true);
+    $(document).get(0).addEventListener("keyup", keyupHandler, true);
     $(document).get(0).addEventListener("keypress", keypressHandler, true);
 });
