@@ -1,15 +1,19 @@
 ## P0
     - Set up customizable non-text hotkey
+    - Fix: hotkeys are completely blocked when within the editing part of a
+      Google Doc
 
 ## P1
     - When user saves on options page, send message to background page to
       refresh its hotkeys
-    - Fix flakiness of left-right navigation. Pretty sure it's due to the
-      repeat delay of the keydown event, so that when you switch to another
-      tab, it doesn't recognize the hold key as down until after the repeat
-      interval (or maybe if it's already down when you switch, it doesn't fire
-      a keydown event at all on the new tab?).
 
 ## P2
+    - Load hotkeys in alpha order (by hotkey) in options page
+    - Add (customizable) shortcut for closing tab
+    - Display tab titles in search
 
 ## P3
+    - Add additional key (shift maybe?) for moving tabs left/right
+    - Enable up/down selection in tab search
+    - Figure out a way to deduplicate shared constants across scripts
+    - Block escape behavior (clearing search bar) on Wikipedia homepage

@@ -22,6 +22,7 @@ function keydownHandler(e) {
     if (e.which == HOTKEY_HOLD_KEY) {
         if (!holding) {
             console.log("Holding for hotkey...");
+            chrome.runtime.sendMessage({holdKey: true});
             holding = true;
         }
     }
@@ -40,11 +41,13 @@ function keyupHandler(e) {
         }
         e.stopPropagation();
         console.log("Released for hotkey.");
+        chrome.runtime.sendMessage({holdKey: false});
         holding = false;
     }
 }
 
 function keypressHandler(e) {
+    console.log("keypressHandler");
     if (holding) {
         // Capture [A-Za-z].
         if (65 <= e.keyCode && e.keyCode <= 90 || 
@@ -73,6 +76,15 @@ function keypressHandler(e) {
         e.preventDefault();
     }
 }
+
+// Listen for globally broadcasted hold key events and update own state.
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.hasOwnProperty("holdKey")) {
+        holding = request.holdKey;
+        console.log("Received hold key " + (holding ? "pressed" : "released") +
+                ".");
+    }
+});
 
 // TODO: Will waiting until document ready cause too much delay before the user
 // can start using the hotkeys?

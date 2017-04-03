@@ -92,33 +92,45 @@ var NAV_LEFT_SYMBOL = '[';
 var NAV_RIGHT_SYMBOL = ']';
 var TAB_SEARCH_SYMBOL = ';';
 
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-      var hotkey = request.hotkey;
-      console.log("Received hotkey: " + hotkey);
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.hasOwnProperty("hotkey")) {
+        var hotkey = request.hotkey;
+        console.log("Received hotkey: " + hotkey);
 
-      if(hotkey == NAV_LEFT_SYMBOL){
-          go_left_right(true);
-      }
-      else if(hotkey == NAV_RIGHT_SYMBOL){
-          go_left_right(false);
-      }
-      else if (hotkey == TAB_SEARCH_SYMBOL) {
-          console.log("Open popup");
-          chrome.tabs.create({url:"popup.html"});
-      }
-      else{
-          var normalized = hotkey.toLowerCase();
-          var overrideDeduplicate = hotkey != normalized;
+        if(hotkey == NAV_LEFT_SYMBOL){
+            go_left_right(true);
+        }
+        else if(hotkey == NAV_RIGHT_SYMBOL){
+            go_left_right(false);
+        }
+        else if (hotkey == TAB_SEARCH_SYMBOL) {
+            console.log("Open popup");
+            chrome.tabs.create({url:"popup.html"});
+        }
+        else{
+            var normalized = hotkey.toLowerCase();
+            var overrideDeduplicate = hotkey != normalized;
 
-          if (normalized in mappings) {
-              var hotkey_info = mappings[normalized];
-              domain = hotkey_info.domain;
-              if (domain) {
-                  checked_new_tab(domain, hotkey_info.deduplicate &&
-                        !overrideDeduplicate);
-              }
-          }
-      }
-  }
-);
+            if (normalized in mappings) {
+                var hotkey_info = mappings[normalized];
+                domain = hotkey_info.domain;
+                if (domain) {
+                    checked_new_tab(domain, hotkey_info.deduplicate &&
+                          !overrideDeduplicate);
+                }
+            }
+        }
+    }
+
+    // Hold key event (pressed or released); broadcast to all tabs.
+    if (request.hasOwnProperty("holdKey")) {
+        var pressed = request.holdKey;
+        console.log("Broadcasting hold key " + (pressed ? "pressed" :
+                "released") + ".");
+        chrome.tabs.query({}, function(tabs) {
+            for (tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {holdKey: pressed});
+            }
+        });
+    }
+});
