@@ -25,6 +25,8 @@ function keydownHandler(e) {
             chrome.runtime.sendMessage({holdKey: true});
             holding = true;
         }
+        // Prevent default behavior of hold key.
+        e.preventDefault();
     }
     if (holding) {
         e.stopPropagation();
@@ -86,10 +88,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 });
 
-// TODO: Will waiting until document ready cause too much delay before the user
-// can start using the hotkeys?
-$(document).ready(function() {
-    $(document).get(0).addEventListener("keydown", keydownHandler, true);
-    $(document).get(0).addEventListener("keyup", keyupHandler, true);
-    $(document).get(0).addEventListener("keypress", keypressHandler, true);
-});
+$(window).get(0).addEventListener("keydown", keydownHandler, true);
+$(window).get(0).addEventListener("keyup", keyupHandler, true);
+$(window).get(0).addEventListener("keypress", keypressHandler, true);
