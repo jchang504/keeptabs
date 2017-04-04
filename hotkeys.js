@@ -2,11 +2,14 @@ var HOTKEY_HOLD_KEY = 27; // Escape.
 // Hotkeys for navigating to left or right tab.
 var NAV_LEFT_KEY_CODE = 91;
 var NAV_RIGHT_KEY_CODE = 93;
+// Hotkey for closing tabs.
+var TAB_CLOSE_KEY_CODE = 59;
 // Hotkey for searching tabs.
-var TAB_SEARCH_KEY_CODE = 59;
+var TAB_SEARCH_KEY_CODE = 47;
 var NAV_LEFT_SYMBOL = '[';
 var NAV_RIGHT_SYMBOL = ']';
-var TAB_SEARCH_SYMBOL = ';';
+var TAB_CLOSE_SYMBOL = ';';
+var TAB_SEARCH_SYMBOL = '/';
 
 var holding = false;
 var hotkey = '';
@@ -56,18 +59,20 @@ function keypressHandler(e) {
             97 <= e.keyCode && e.keyCode <= 122) {
             hotkey += String.fromCharCode(e.keyCode);
         }
-        // Capture left/right navigation and tab search hotkeys. Send them
-        // immediately so that the user can repeatedly move left or right
-        // without releasing the hold key.
-        // TODO: This sometimes gets caught when you move to a tab
-        // where an input box is focused; not totally sure why as
-        // it should still be getting the keydown for the hold key.
+        // Capture left/right navigation, tab close, and tab search hotkeys.
+        // Send them immediately so that the user can repeatedly move left or
+        // right without releasing the hold key.
+        // TODO: Refactor to dedup logic.
         else if (e.keyCode == NAV_LEFT_KEY_CODE) {
             sendHotkeyMessage(NAV_LEFT_SYMBOL);
             hotkey = '';
         }
         else if (e.keyCode == NAV_RIGHT_KEY_CODE) {
             sendHotkeyMessage(NAV_RIGHT_SYMBOL);
+            hotkey = '';
+        }
+        else if (e.keyCode == TAB_CLOSE_KEY_CODE) {
+            sendHotkeyMessage(TAB_CLOSE_SYMBOL);
             hotkey = '';
         }
         else if (e.keyCode == TAB_SEARCH_KEY_CODE) {

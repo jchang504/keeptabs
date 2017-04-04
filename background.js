@@ -64,6 +64,14 @@ function go_left_right(goLeft) {
     });
 }
 
+function closeCurrentTab() {
+    console.log("Close current tab");
+    chrome.tabs.query({currentWindow: true, active: true},
+            function(currentTab) {
+        chrome.tabs.remove(currentTab[0].id);
+    });
+}
+
 var mappings = {};
 
 function get_mapped_domains() {
@@ -90,7 +98,8 @@ get_mapped_domains()
 
 var NAV_LEFT_SYMBOL = '[';
 var NAV_RIGHT_SYMBOL = ']';
-var TAB_SEARCH_SYMBOL = ';';
+var TAB_CLOSE_SYMBOL = ';';
+var TAB_SEARCH_SYMBOL = '/';
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.hasOwnProperty("hotkey")) {
@@ -103,8 +112,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         else if(hotkey == NAV_RIGHT_SYMBOL){
             go_left_right(false);
         }
+        else if (hotkey == TAB_CLOSE_SYMBOL) {
+            closeCurrentTab();
+        }
         else if (hotkey == TAB_SEARCH_SYMBOL) {
-            console.log("Open popup");
+            console.log("Open tab search");
             chrome.tabs.create({url:"popup.html"});
         }
         else{
@@ -121,9 +133,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             }
         }
     }
-
     // Hold key event (pressed or released); broadcast to all tabs.
-    if (request.hasOwnProperty("holdKey")) {
+    else if (request.hasOwnProperty("holdKey")) {
         var pressed = request.holdKey;
         console.log("Broadcasting hold key " + (pressed ? "pressed" :
                 "released") + ".");
