@@ -66,6 +66,8 @@ function saveOptions() {
     chrome.storage.sync.set({
         hotkeys: hotkeys
     }, function() {
+        console.log("Sending refresh request to background script.");
+        chrome.runtime.sendMessage({refresh: true});
         // Disable save button to indicate that options are saved.
         $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
     });

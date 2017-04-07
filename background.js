@@ -75,25 +75,18 @@ function closeCurrentTab() {
 var mappings = {};
 
 function get_mapped_domains() {
-  chrome.storage.sync.get({
-    hotkeys:[]
-  }, function(items){
-
-    for (hotkey_info of items.hotkeys){
-      var hotkey_map = {};
-      var hotkey = hotkey_info.hotkey;
-      hotkey_map.domain = hotkey_info.domain;
-      hotkey_map.deduplicate = hotkey_info.deduplicate;
-
-      mappings[hotkey] = hotkey_map;
-
-    }
-  });
+    mappings = {};
+    chrome.storage.sync.get({hotkeys: []}, function(items){
+        for (hotkey_info of items.hotkeys){
+            var hotkey_map = {};
+            var hotkey = hotkey_info.hotkey;
+            hotkey_map.domain = hotkey_info.domain;
+            hotkey_map.deduplicate = hotkey_info.deduplicate;
+            mappings[hotkey] = hotkey_map;
+        }
+    });
 }
 
-// TODO: Change this to get the hotkeys every time we receive one, so that user
-// does not have to reload the background script after editing options for
-// changes to take effect.
 get_mapped_domains()
 
 var NAV_LEFT_SYMBOL = '[';
@@ -102,7 +95,19 @@ var TAB_CLOSE_SYMBOL = ';';
 var TAB_SEARCH_SYMBOL = '/';
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.hasOwnProperty("hotkey")) {
+    // Hold key event (pressed or released); broadcast to all tabs.
+    if (request.hasOwnProperty("holdKey")) {
+        var pressed = request.holdKey;
+        console.log("Broadcasting hold key " + (pressed ? "pressed" :
+                "released") + ".");
+        chrome.tabs.query({}, function(tabs) {
+            for (tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {holdKey: pressed});
+            }
+        });
+    }
+    // Hotkey sent.
+    else if (request.hasOwnProperty("hotkey")) {
         var hotkey = request.hotkey;
         console.log("Received hotkey: " + hotkey);
 
@@ -133,15 +138,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             }
         }
     }
-    // Hold key event (pressed or released); broadcast to all tabs.
-    else if (request.hasOwnProperty("holdKey")) {
-        var pressed = request.holdKey;
-        console.log("Broadcasting hold key " + (pressed ? "pressed" :
-                "released") + ".");
-        chrome.tabs.query({}, function(tabs) {
-            for (tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {holdKey: pressed});
-            }
-        });
+    // Refresh hotkeys after options edit.
+    else if (request.hasOwnProperty("refresh")) {
+        console.log("Refreshing hotkeys.");
+        get_mapped_domains();
     }
 });
