@@ -3,16 +3,15 @@ var holding = false;
 var hotkey = '';
 
 function sendHotkeyMessage(hotkey) {
-    console.log("Sending hotkey: " + hotkey);
+    LOG_INFO("Send hotkey: " + hotkey);
     chrome.runtime.sendMessage({[HOTKEY_MSG]: hotkey});
 }
 
 function keydownHandler(e) {
-    console.log("keydownHandler");
     // When hold key pressed, block text entry and wait for hotkey.
     if (e.which == HOTKEY_HOLD_KEY_CODE) {
         if (!holding) {
-            console.log("Holding for hotkey...");
+            LOG_INFO("Holding for hotkey...");
             chrome.runtime.sendMessage({[HOLDKEY_MSG]: true});
             holding = true;
         }
@@ -25,7 +24,6 @@ function keydownHandler(e) {
 }
 
 function keyupHandler(e) {
-    console.log("keyupHandler");
     // When hold key released, unblock text entry and send any hotkey entered.
     if (e.which == HOTKEY_HOLD_KEY_CODE) {
         if (hotkey.length > 0) {
@@ -33,14 +31,13 @@ function keyupHandler(e) {
             hotkey = '';
         }
         e.stopPropagation();
-        console.log("Released for hotkey.");
+        LOG_INFO("Released for hotkey.");
         chrome.runtime.sendMessage({[HOLDKEY_MSG]: false});
         holding = false;
     }
 }
 
 function keypressHandler(e) {
-    console.log("keypressHandler");
     if (holding) {
         // Capture [A-Za-z].
         if (65 <= e.keyCode && e.keyCode <= 90 || 
@@ -76,8 +73,8 @@ function keypressHandler(e) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.hasOwnProperty(HOLDKEY_MSG)) {
         holding = request[HOLDKEY_MSG];
-        console.log("Received hold key " + (holding ? "pressed" : "released") +
-                ".");
+        var hold_event_type = holding ? "pressed" : "released";
+        LOG_INFO("Received hold key " + hold_event_type);
     }
 });
 

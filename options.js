@@ -66,11 +66,10 @@ function restoreHotkeyEntrys(hotkeys) {
 // Saves options to chrome.storage.sync.
 function saveOptions() {
     var hotkeys = getHotkeyEntrys();
-    console.log(hotkeys);
     chrome.storage.sync.set({
         [HOTKEYS_KEY]: hotkeys
     }, function() {
-        console.log("Sending refresh request to background script.");
+        LOG_INFO("Sending refresh request to background script");
         chrome.runtime.sendMessage({[REFRESH_MSG]: true});
         // Disable save button to indicate that options are saved.
         $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
@@ -82,7 +81,6 @@ function saveOptions() {
 function restoreOptions() {
     // Default values.
     chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items) {
-        console.log(items[HOTKEYS_KEY]);
         restoreHotkeyEntrys(items[HOTKEYS_KEY]);
     });
 }

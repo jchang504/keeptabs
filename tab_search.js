@@ -18,7 +18,7 @@ function closeSearchAndNavigate(tab_id, window_id) {
 
 // Navigate to the first tab in the results list.
 function navigateToFirstResult(){
-    console.log("Navigate to first search result");
+    LOG_INFO("Navigate to first search result");
     if (filtered_tabs && filtered_tabs.length > 0) {
         var tab = filtered_tabs[0];
         closeSearchAndNavigate(tab.id, tab.windowId);
@@ -31,14 +31,14 @@ function navigateToFirstResult(){
 // event handler that navigates to the given tab.
 function createClosure(myTab) {
     return function(e) {
-        console.log("Selected from search: " + myTab.url);
+        LOG_INFO("Selected from search: " + myTab.url);
         closeSearchAndNavigate(myTab.id, myTab.windowId);
     };
 }
 
 // Populate the results list with matching results.
 function populate() {
-    console.log("Populate the results list");
+    LOG_INFO("Populate the results list");
     chrome.tabs.query({}, function(tabs) {
         filtered_tabs = tabs;
         var fuzzy_input = $(FUZZY_INPUT_SELECTOR).val();

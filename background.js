@@ -20,14 +20,14 @@ function openTab(url, deduplicate){
                 var tab_domain = domain_regex.exec(tab_url)[1];
                 if (target_domain == tab_domain) {
                     var tab_id = tab.id;
-                    console.log("Switch active tab to: " + tab_url);
+                    LOG_INFO("Switch active tab to: " + tab_url);
                     chrome.tabs.update(tab_id, {[ACTIVE]: true});
                     chrome.windows.update(tab.windowId, {[FOCUSED]: true});
                     return;
                 };
             }
         }
-        console.log("Create new tab of: " + url);
+        LOG_INFO("Create new tab of: " + url);
         chrome.tabs.create({[URL]: url});
     });
 }
@@ -45,13 +45,13 @@ function navigateLeftRight(is_left) {
         var offset = is_left ? -1 : 1;
         var next_tab_index = (curr_tab_index + length + offset) % length;
         var direction = is_left ? "left" : "right";
-        console.log("Switch active tab to " + direction);
+        LOG_INFO("Navigate to " + direction + " tab");
         chrome.tabs.update(tabs[next_tab_index].id, {[ACTIVE]: true});
     });
 }
 
 function closeCurrentTab() {
-    console.log("Close current tab");
+    LOG_INFO("Close current tab");
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
             function(currentTab) {
         chrome.tabs.remove(currentTab[0].id);
@@ -60,6 +60,7 @@ function closeCurrentTab() {
 
 // Load hotkeys from Chrome storage into global map.
 function loadHotkeys() {
+    LOG_INFO("Load hotkeys");
     hotkeys_map = {};
     chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items){
         for (hotkey_info of items[HOTKEYS_KEY]){
@@ -75,8 +76,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Hold key event (pressed or released); broadcast to all tabs.
     if (request.hasOwnProperty(HOLDKEY_MSG)) {
         var pressed = request[HOLDKEY_MSG];
-        console.log("Broadcasting hold key " + (pressed ? "pressed" :
-                "released") + ".");
+        var hold_event_type = pressed ? "pressed" : "released";
+        LOG_INFO("Broadcasting hold key " + hold_event_type);
         chrome.tabs.query({}, function(tabs) {
             for (tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {[HOLDKEY_MSG]: pressed});
@@ -86,7 +87,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Hotkey sent.
     else if (request.hasOwnProperty(HOTKEY_MSG)) {
         var hotkey = request[HOTKEY_MSG];
-        console.log("Received hotkey: " + hotkey);
+        LOG_INFO("Received hotkey: " + hotkey);
         if (hotkey == NAV_LEFT_SYMBOL){
             navigateLeftRight(true);
         }
@@ -97,7 +98,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             closeCurrentTab();
         }
         else if (hotkey == TAB_SEARCH_SYMBOL) {
-            console.log("Open tab search");
+            LOG_INFO("Open tab search");
             chrome.tabs.create({[URL]: SEARCH_URL});
         }
         else {
@@ -117,7 +118,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
     // Refresh hotkeys after options edit.
     else if (request.hasOwnProperty(REFRESH_MSG)) {
-        console.log("Refreshing hotkeys.");
+        LOG_INFO("Refresh hotkeys");
         loadHotkeys();
     }
 });

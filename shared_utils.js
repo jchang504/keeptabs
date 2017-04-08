@@ -45,3 +45,26 @@ var INPUT = "input";
 var KEYDOWN = "keydown";
 var KEYPRESS = "keypress";
 var KEYUP = "keyup";
+
+/* Logging helpers */
+var ERROR_LEVEL = 0;
+var WARNING_LEVEL = 1;
+var INFO_LEVEL = 2;
+// Edit this to change logging behavior.
+var LOGGING_LEVEL = INFO_LEVEL;
+
+function LOG_INFO(msg) {
+    if (LOGGING_LEVEL >= INFO_LEVEL) {
+        console.log("I: " + msg);
+    }
+}
+function LOG_WARNING(msg) {
+    if (LOGGING_LEVEL >= WARNING_LEVEL) {
+        console.log("W: " + msg);
+    }
+}
+function LOG_ERROR(msg) {
+    if (LOGGING_LEVEL >= ERROR_LEVEL) {
+        console.log("E: " + msg);
+    }
+}
