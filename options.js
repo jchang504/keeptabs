@@ -1,3 +1,4 @@
+// CSS selectors.
 var HOTKEY_ENTRYS_TABLE_SELECTOR = '#hotkey_entry > tbody';
 var HOTKEY_ENTRY_ROWS_SELECTOR = '#hotkey_entry tr:not(:first-child)';
 var HOTKEY_ENTRY_LAST_ROW_SELECTOR = '#hotkey_entry tr:last-child';
@@ -10,6 +11,7 @@ var INPUT_DEDUPLICATE_SELECTOR = 'input[name="deduplicate"]';
 var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
 var SAVE_BUTTON_SELECTOR = '#save';
+var CHECKED = 'checked';
 var DISABLED = 'disabled';
 
 var HOTKEY_ENTRY_HTML = ' \
@@ -37,12 +39,12 @@ function getHotkeyEntrys() {
         var jqThis = $(this);
         var domain = jqThis.find(INPUT_DOMAIN_SELECTOR).val();
         var hotkey = jqThis.find(INPUT_HOTKEY_SELECTOR).val();
-        var deduplicate = jqThis.find(INPUT_DEDUPLICATE_SELECTOR).is(
-                ':checked');
+        var deduplicate = jqThis.find(INPUT_DEDUPLICATE_SELECTOR).is(':' +
+                CHECKED);
         hotkeys.push({
-            domain: domain,
-            hotkey: hotkey,
-            deduplicate: deduplicate
+            [DOMAIN_KEY]: domain,
+            [HOTKEY_KEY]: hotkey,
+            [DEDUPLICATE_KEY]: deduplicate
         });
     });
     return hotkeys;
@@ -52,10 +54,12 @@ function restoreHotkeyEntrys(hotkeys) {
     for (var i = 0; i < hotkeys.length; i++) {
         addHotkeyEntry();
         var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
-        jqHotkeyEntryRow.find(INPUT_DOMAIN_SELECTOR).val(hotkeys[i].domain);
-        jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(hotkeys[i].hotkey);
-        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).prop('checked',
-                hotkeys[i].deduplicate);
+        jqHotkeyEntryRow.find(INPUT_DOMAIN_SELECTOR).val(
+                hotkeys[i][DOMAIN_KEY]);
+        jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(
+                hotkeys[i][HOTKEY_KEY]);
+        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).prop(CHECKED,
+                hotkeys[i][DEDUPLICATE_KEY]);
     }
 }
 
@@ -64,10 +68,10 @@ function saveOptions() {
     var hotkeys = getHotkeyEntrys();
     console.log(hotkeys);
     chrome.storage.sync.set({
-        hotkeys: hotkeys
+        [HOTKEYS_KEY]: hotkeys
     }, function() {
         console.log("Sending refresh request to background script.");
-        chrome.runtime.sendMessage({refresh: true});
+        chrome.runtime.sendMessage({[REFRESH_MSG]: true});
         // Disable save button to indicate that options are saved.
         $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
     });
@@ -77,11 +81,9 @@ function saveOptions() {
 // Restores options as previously stored in chrome.storage.sync.
 function restoreOptions() {
     // Default values.
-    chrome.storage.sync.get({
-        hotkeys: []
-    }, function(items) {
-        console.log(items.hotkeys);
-        restoreHotkeyEntrys(items.hotkeys);
+    chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items) {
+        console.log(items[HOTKEYS_KEY]);
+        restoreHotkeyEntrys(items[HOTKEYS_KEY]);
     });
 }
 

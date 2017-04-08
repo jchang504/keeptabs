@@ -1,31 +1,19 @@
-var HOTKEY_HOLD_KEY = 27; // Escape.
-// Hotkeys for navigating to left or right tab.
-var NAV_LEFT_KEY_CODE = 91;
-var NAV_RIGHT_KEY_CODE = 93;
-// Hotkey for closing tabs.
-var TAB_CLOSE_KEY_CODE = 59;
-// Hotkey for searching tabs.
-var TAB_SEARCH_KEY_CODE = 47;
-var NAV_LEFT_SYMBOL = '[';
-var NAV_RIGHT_SYMBOL = ']';
-var TAB_CLOSE_SYMBOL = ';';
-var TAB_SEARCH_SYMBOL = '/';
-
+// Global state.
 var holding = false;
 var hotkey = '';
 
 function sendHotkeyMessage(hotkey) {
     console.log("Sending hotkey: " + hotkey);
-    chrome.runtime.sendMessage({hotkey: hotkey});
+    chrome.runtime.sendMessage({[HOTKEY_MSG]: hotkey});
 }
 
 function keydownHandler(e) {
     console.log("keydownHandler");
     // When hold key pressed, block text entry and wait for hotkey.
-    if (e.which == HOTKEY_HOLD_KEY) {
+    if (e.which == HOTKEY_HOLD_KEY_CODE) {
         if (!holding) {
             console.log("Holding for hotkey...");
-            chrome.runtime.sendMessage({holdKey: true});
+            chrome.runtime.sendMessage({[HOLDKEY_MSG]: true});
             holding = true;
         }
         // Prevent default behavior of hold key.
@@ -39,14 +27,14 @@ function keydownHandler(e) {
 function keyupHandler(e) {
     console.log("keyupHandler");
     // When hold key released, unblock text entry and send any hotkey entered.
-    if (e.which == HOTKEY_HOLD_KEY) {
+    if (e.which == HOTKEY_HOLD_KEY_CODE) {
         if (hotkey.length > 0) {
             sendHotkeyMessage(hotkey);
             hotkey = '';
         }
         e.stopPropagation();
         console.log("Released for hotkey.");
-        chrome.runtime.sendMessage({holdKey: false});
+        chrome.runtime.sendMessage({[HOLDKEY_MSG]: false});
         holding = false;
     }
 }
@@ -86,13 +74,13 @@ function keypressHandler(e) {
 
 // Listen for globally broadcasted hold key events and update own state.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.hasOwnProperty("holdKey")) {
-        holding = request.holdKey;
+    if (request.hasOwnProperty(HOLDKEY_MSG)) {
+        holding = request[HOLDKEY_MSG];
         console.log("Received hold key " + (holding ? "pressed" : "released") +
                 ".");
     }
 });
 
-$(window).get(0).addEventListener("keydown", keydownHandler, true);
-$(window).get(0).addEventListener("keyup", keyupHandler, true);
-$(window).get(0).addEventListener("keypress", keypressHandler, true);
+$(window).get(0).addEventListener(KEYDOWN, keydownHandler, true);
+$(window).get(0).addEventListener(KEYUP, keyupHandler, true);
+$(window).get(0).addEventListener(KEYPRESS, keypressHandler, true);
