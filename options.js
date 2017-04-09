@@ -51,6 +51,18 @@ function getHotkeyEntrys() {
 }
 
 function restoreHotkeyEntrys(hotkeys) {
+    function compareHotkey(entry1, entry2) {
+        if (entry1[HOTKEY_KEY] < entry2[HOTKEY_KEY]) {
+            return -1;
+        }
+        else if (entry1[HOTKEY_KEY] > entry2[HOTKEY_KEY]) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    hotkeys.sort(compareHotkey);
     for (var i = 0; i < hotkeys.length; i++) {
         addHotkeyEntry();
         var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
