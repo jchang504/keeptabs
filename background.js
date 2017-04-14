@@ -32,7 +32,10 @@ function openTab(url, deduplicate){
     });
 }
 
-function navigateLeftRight(is_left) {
+/* direction: -1 for left, 1 for right
+ * move: true for moving tab left/right, false for navigating left/right
+ */
+function leftRightNavOrMove(direction, move) {
     chrome.tabs.query({[CURRENT_WINDOW]: true}, function(tabs) {
         var curr_tab_index;
         for (tab of tabs) {
@@ -42,11 +45,17 @@ function navigateLeftRight(is_left) {
             }
         }
         var length = tabs.length;
-        var offset = is_left ? -1 : 1;
-        var next_tab_index = (curr_tab_index + length + offset) % length;
-        var direction = is_left ? "left" : "right";
-        LOG_INFO("Navigate to " + direction + " tab");
-        chrome.tabs.update(tabs[next_tab_index].id, {[ACTIVE]: true});
+        var next_tab_index = (curr_tab_index + length + direction) % length;
+        var label = direction == -1 ? "left" : "right";
+        if (move) {
+            LOG_INFO("Move current tab " + label);
+            chrome.tabs.move(tabs[curr_tab_index].id, {[INDEX]:
+                    next_tab_index});
+        }
+        else {
+            LOG_INFO("Navigate to " + label + " tab");
+            chrome.tabs.update(tabs[next_tab_index].id, {[ACTIVE]: true});
+        }
     });
 }
 
@@ -89,10 +98,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         var hotkey = request[HOTKEY_MSG];
         LOG_INFO("Received hotkey: " + hotkey);
         if (hotkey == NAV_LEFT_SYMBOL){
-            navigateLeftRight(true);
+            leftRightNavOrMove(-1, false);
         }
         else if (hotkey == NAV_RIGHT_SYMBOL){
-            navigateLeftRight(false);
+            leftRightNavOrMove(1, false);
+        }
+        else if (hotkey == MOVE_LEFT_SYMBOL){
+            leftRightNavOrMove(-1, true);
+        }
+        else if (hotkey == MOVE_RIGHT_SYMBOL){
+            leftRightNavOrMove(1, true);
         }
         else if (hotkey == TAB_CLOSE_SYMBOL) {
             closeCurrentTab();

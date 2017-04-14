@@ -37,6 +37,16 @@ function keyupHandler(e) {
     }
 }
 
+// Mapping of special hotkey key codes to message symbols.
+SPECIAL_KEY_CODE_TO_SYMBOL = {
+    [NAV_LEFT_KEY_CODE]: NAV_LEFT_SYMBOL,
+    [NAV_RIGHT_KEY_CODE]: NAV_RIGHT_SYMBOL,
+    [MOVE_LEFT_KEY_CODE]: MOVE_LEFT_SYMBOL,
+    [MOVE_RIGHT_KEY_CODE]: MOVE_RIGHT_SYMBOL,
+    [TAB_CLOSE_KEY_CODE]: TAB_CLOSE_SYMBOL,
+    [TAB_SEARCH_KEY_CODE]: TAB_SEARCH_SYMBOL
+}
+
 function keypressHandler(e) {
     if (holding) {
         // Capture [A-Za-z].
@@ -48,20 +58,8 @@ function keypressHandler(e) {
         // Send them immediately so that the user can repeatedly move left or
         // right without releasing the hold key.
         // TODO: Refactor to dedup logic.
-        else if (e.keyCode == NAV_LEFT_KEY_CODE) {
-            sendHotkeyMessage(NAV_LEFT_SYMBOL);
-            hotkey = '';
-        }
-        else if (e.keyCode == NAV_RIGHT_KEY_CODE) {
-            sendHotkeyMessage(NAV_RIGHT_SYMBOL);
-            hotkey = '';
-        }
-        else if (e.keyCode == TAB_CLOSE_KEY_CODE) {
-            sendHotkeyMessage(TAB_CLOSE_SYMBOL);
-            hotkey = '';
-        }
-        else if (e.keyCode == TAB_SEARCH_KEY_CODE) {
-            sendHotkeyMessage(TAB_SEARCH_SYMBOL);
+        else if (e.keyCode in SPECIAL_KEY_CODE_TO_SYMBOL) {
+            sendHotkeyMessage(SPECIAL_KEY_CODE_TO_SYMBOL[e.keyCode]);
             hotkey = '';
         }
         e.stopPropagation();

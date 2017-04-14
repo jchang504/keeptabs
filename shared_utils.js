@@ -9,22 +9,29 @@ var CURRENT_WINDOW = "currentWindow";
 var CURRENT_TAB = "currentTab";
 var FOCUSED = "focused";
 var URL = "url";
+var INDEX = "index";
 
 /* Key codes + symbols */
 // TODO: Allow customization. For now:
 // 27 = Esc
 // 91 = [
 // 93 = ]
+// 123 = {
+// 125 = }
 // 59 = ;
 // 47 = /
 var HOTKEY_HOLD_KEY_CODE = 27;
 var NAV_LEFT_KEY_CODE = 91;
 var NAV_RIGHT_KEY_CODE = 93;
+var MOVE_LEFT_KEY_CODE = 123;
+var MOVE_RIGHT_KEY_CODE = 125;
 var TAB_CLOSE_KEY_CODE = 59;
 var TAB_SEARCH_KEY_CODE = 47;
 // Hotkey symbols.
 var NAV_LEFT_SYMBOL = '[';
 var NAV_RIGHT_SYMBOL = ']';
+var MOVE_LEFT_SYMBOL = '{';
+var MOVE_RIGHT_SYMBOL = '}';
 var TAB_CLOSE_SYMBOL = ';';
 var TAB_SEARCH_SYMBOL = '/';
 // For tab search page.
