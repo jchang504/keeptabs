@@ -44,7 +44,8 @@ SPECIAL_KEY_CODE_TO_SYMBOL = {
     [MOVE_LEFT_KEY_CODE]: MOVE_LEFT_SYMBOL,
     [MOVE_RIGHT_KEY_CODE]: MOVE_RIGHT_SYMBOL,
     [TAB_CLOSE_KEY_CODE]: TAB_CLOSE_SYMBOL,
-    [TAB_SEARCH_KEY_CODE]: TAB_SEARCH_SYMBOL
+    [TAB_SEARCH_KEY_CODE]: TAB_SEARCH_SYMBOL,
+    [NAV_PREVIOUS_KEY_CODE]: NAV_PREVIOUS_SYMBOL
 }
 
 function keypressHandler(e) {
@@ -54,10 +55,8 @@ function keypressHandler(e) {
             97 <= e.keyCode && e.keyCode <= 122) {
             hotkey += String.fromCharCode(e.keyCode);
         }
-        // Capture left/right navigation, tab close, and tab search hotkeys.
-        // Send them immediately so that the user can repeatedly move left or
-        // right without releasing the hold key.
-        // TODO: Refactor to dedup logic.
+        // Capture special hotkeys. Send them immediately so that the user can
+        // repeatedly use them without releasing the hold key.
         else if (e.keyCode in SPECIAL_KEY_CODE_TO_SYMBOL) {
             sendHotkeyMessage(SPECIAL_KEY_CODE_TO_SYMBOL[e.keyCode]);
             hotkey = '';

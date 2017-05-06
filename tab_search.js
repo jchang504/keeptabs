@@ -10,6 +10,8 @@ var TITLE_KEY = "title"
 var filtered_tabs = [];
 
 function closeSearchAndNavigate(tab_id, window_id) {
+    // TODO: Add support for saving last tab correctly. Probably requires
+    // sending a message to the background script.
     // Close search tab.
     window.close();
     chrome.tabs.update(tab_id, {[ACTIVE]: true});

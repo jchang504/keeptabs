@@ -3,6 +3,20 @@ var domain_regex = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\
 
 // Global state.
 var hotkeys_map = {};
+var last_tab_id = null;
+
+// Navigate to (make active) the specified tab (and focus its window, if the
+// optional argument is provided. Before navigating, update the last_tab_id.
+function navigateToTab(tab_id, window_id) {
+    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
+            function(tabs) {
+        last_tab_id = tabs[0].id;
+        chrome.tabs.update(tab_id, {[ACTIVE]: true});
+        if (window_id !== undefined) {
+            chrome.windows.update(window_id, {[FOCUSED]: true});
+        }
+    });
+}
 
 /*
  * url: the string that includes the protocol and domain name of the site you
@@ -19,10 +33,8 @@ function openTab(url, deduplicate){
                 var tab_url = tab.url;
                 var tab_domain = domain_regex.exec(tab_url)[1];
                 if (target_domain == tab_domain) {
-                    var tab_id = tab.id;
                     LOG_INFO("Switch active tab to: " + tab_url);
-                    chrome.tabs.update(tab_id, {[ACTIVE]: true});
-                    chrome.windows.update(tab.windowId, {[FOCUSED]: true});
+                    navigateToTab(tab.id, tab.windowId);
                     return;
                 };
             }
@@ -54,7 +66,20 @@ function leftRightNavOrMove(direction, move) {
         }
         else {
             LOG_INFO("Navigate to " + label + " tab");
-            chrome.tabs.update(tabs[next_tab_index].id, {[ACTIVE]: true});
+            navigateToTab(tabs[next_tab_index].id);
+        }
+    });
+}
+
+// Navigate to the previous tab that was navigated to with KeepTabs. Useful for
+// quick alt+tab style switching between two tabs.
+function navigateToPreviousTab() {
+    chrome.tabs.query({}, function(tabs) {
+        for (tab of tabs) {
+            if (tab.id == last_tab_id) {
+                // If last_tab_id is valid, navigate to it.
+                navigateToTab(tab.id, tab.windowId);
+            }
         }
     });
 }
@@ -115,6 +140,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         else if (hotkey == TAB_SEARCH_SYMBOL) {
             LOG_INFO("Open tab search");
             chrome.tabs.create({[URL]: SEARCH_URL});
+        }
+        else if (hotkey == NAV_PREVIOUS_SYMBOL) {
+            navigateToPreviousTab();
         }
         else {
             var normalized = hotkey.toLowerCase();
