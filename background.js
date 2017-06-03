@@ -18,6 +18,15 @@ function navigateToTab(tab_id, window_id) {
     });
 }
 
+function createNewTab(url) {
+    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
+            function(tabs) {
+        last_tab_id = tabs[0].id;
+        LOG_INFO("Create new tab of: " + url);
+        chrome.tabs.create({[URL]: url});
+    });
+}
+
 /*
  * url: the string that includes the protocol and domain name of the site you
  * want to go to (e.g. "https://www.google.com").
@@ -36,11 +45,10 @@ function openTab(url, deduplicate){
                     LOG_INFO("Switch active tab to: " + tab_url);
                     navigateToTab(tab.id, tab.windowId);
                     return;
-                };
+                }
             }
         }
-        LOG_INFO("Create new tab of: " + url);
-        chrome.tabs.create({[URL]: url});
+        createNewTab(url);
     });
 }
 
