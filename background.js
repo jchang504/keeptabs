@@ -4,10 +4,13 @@ var domain_regex = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\
 // Global state.
 var hotkeys_map = {};
 var last_tab_id = null;
+// The last tab from which a tab search was launched via hotkey.
+var search_launch_tab_id = null;
 
 // Navigate to (make active) the specified tab (and focus its window, if the
-// optional argument is provided. Before navigating, update the last_tab_id.
+// optional argument is provided). Before navigating, update the last_tab_id.
 function navigateToTab(tab_id, window_id) {
+    LOG_INFO("Navigate to tab_id: " + tab_id + ", window_id: " + window_id);
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
             function(tabs) {
         last_tab_id = tabs[0].id;
@@ -18,6 +21,7 @@ function navigateToTab(tab_id, window_id) {
     });
 }
 
+// Create a new tab of the url (and navigate to it). Also used for tab search.
 function createNewTab(url) {
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
             function(tabs) {
@@ -82,6 +86,7 @@ function leftRightNavOrMove(direction, move) {
 // Navigate to the previous tab that was navigated to with KeepTabs. Useful for
 // quick alt+tab style switching between two tabs.
 function navigateToPreviousTab() {
+    LOG_INFO("Navigate to previous tab");
     chrome.tabs.query({}, function(tabs) {
         for (tab of tabs) {
             if (tab.id == last_tab_id) {
@@ -111,6 +116,16 @@ function loadHotkeys() {
                 [DEDUPLICATE_KEY]: hotkey_info[DEDUPLICATE_KEY]
             };
         }
+    });
+}
+
+// Open a new tab of the tab search page.
+function openTabSearch() {
+    LOG_INFO("Open tab search");
+    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
+            function(tabs) {
+        search_launch_tab_id = tabs[0].id;
+        createNewTab(SEARCH_URL);
     });
 }
 
@@ -146,8 +161,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             closeCurrentTab();
         }
         else if (hotkey == TAB_SEARCH_SYMBOL) {
-            LOG_INFO("Open tab search");
-            chrome.tabs.create({[URL]: SEARCH_URL});
+            openTabSearch();
         }
         else if (hotkey == NAV_PREVIOUS_SYMBOL) {
             navigateToPreviousTab();
@@ -171,6 +185,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     else if (request.hasOwnProperty(REFRESH_MSG)) {
         LOG_INFO("Refresh hotkeys");
         loadHotkeys();
+    }
+    // Navigate to tab from tab search selection.
+    else if (request.hasOwnProperty(SEARCH_NAV_MSG)) {
+        LOG_INFO("Received navigation request from tab search");
+        chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
+                function(tabs) {
+            var calledFromPopup = tabs[0].id == request[CURRENT_TAB_KEY];
+            if (!calledFromPopup) {
+                // If tab search launched via hotkey, return to launching tab
+                // after closing tab search tab.
+                LOG_INFO("Search launched by hotkey; return to launching tab.");
+                chrome.tabs.update(search_launch_tab_id, {[ACTIVE]: true});
+            }
+            navigateToTab(request[TAB_ID_KEY], request[WINDOW_ID_KEY]);
+        });
     }
 });
 

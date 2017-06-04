@@ -2,6 +2,10 @@
 var HOLDKEY_MSG = "holdKey";
 var HOTKEY_MSG = "hotkey";
 var REFRESH_MSG = "refresh";
+var SEARCH_NAV_MSG = "search_nav";
+var TAB_ID_KEY = "tab_id";
+var WINDOW_ID_KEY = "window_id";
+var CURRENT_TAB_KEY = "current_tab";
 
 // Chrome tabs API functions options keys.
 var ACTIVE = "active";
@@ -46,9 +50,9 @@ var SEARCH_URL = "tab_search.html";
 /* Chrome storage keys and default values */
 var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
-var DOMAIN_KEY = "domain"
-var HOTKEY_KEY = "hotkey"
-var DEDUPLICATE_KEY = "deduplicate"
+var DOMAIN_KEY = "domain";
+var HOTKEY_KEY = "hotkey";
+var DEDUPLICATE_KEY = "deduplicate";
 
 /* JavaScript event names */
 var INPUT = "input";

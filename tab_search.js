@@ -10,12 +10,16 @@ var TITLE_KEY = "title"
 var filtered_tabs = [];
 
 function closeSearchAndNavigate(tab_id, window_id) {
-    // TODO: Add support for saving last tab correctly. Probably requires
-    // sending a message to the background script.
-    // Close search tab.
-    window.close();
-    chrome.tabs.update(tab_id, {[ACTIVE]: true});
-    chrome.windows.update(window_id, {[FOCUSED]: true});
+    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
+            function(tabs) {
+        // Close search tab.
+        window.close();
+        // Send message to background script with tab to navigate to and current
+        // tab id.
+        chrome.runtime.sendMessage({[SEARCH_NAV_MSG]: true,
+                [TAB_ID_KEY]: tab_id, [WINDOW_ID_KEY]: window_id,
+                [CURRENT_TAB_KEY]: tabs[0].id});
+    });
 }
 
 // Navigate to the first tab in the results list.
