@@ -54,5 +54,6 @@ TODO: Insert gif
 
 **NOTE:** If you are going to use the default _hold key_ (which is Escape), we
 highly recommend setting your computer so that your Caps Lock key registers as
-the Escape key.
+the Escape key. This is especially good to do if you are a Vim or an Emacs user
+as those editors use Escape a lot and Caps Lock is easier to reach.
 TODO: Insert instructions on how to do this for various OS
