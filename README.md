@@ -20,7 +20,7 @@ your mouse!)
 <br />
 <br />
 
-### Switch between two tabs easily? Use Spacebar as your hotkey!
+### Go back to your previous tab? Use Spacebar as your hotkey!
 
 ![Switch Demo](switch_demo.gif "switch between two tabs!")
 
