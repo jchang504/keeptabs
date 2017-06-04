@@ -41,11 +41,18 @@ your mouse!)
 1. Download extension from the Google Chrome Web Store (it's free!)
 1. Restart Google Chrome
 1. Set up your hotkeys in the options page
+TODO: Insert gif
 
 ### Use
 
+TODO: Insert gif
 1. Make sure your browser is not focused on any text input
 1. Hold down the _hold key_ (which is set to Escape by default)
 1. Type your hotkey (if you want to create a duplicate tab of a website you
    already have open, hope down shift while doing this step)
 1. Release the _hold key_
+
+**NOTE:** If you are going to use the default _hold key_ (which is Escape), we
+highly recommend setting your computer so that your Caps Lock key registers as
+the Escape key.
+TODO: Insert instructions on how to do this for various OS
