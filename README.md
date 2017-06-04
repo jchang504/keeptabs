@@ -12,7 +12,7 @@ your mouse!
 
 ## Need to...
 
-### Switch to your usual websites?
+### Switch to your usual websites? Press the hotkeys that you set!
 
 ![Normal Demo](demo.gif "switch between tabs quickly!")
 
@@ -21,7 +21,7 @@ your mouse!
 <br />
 <br />
 
-### Switch between two tabs easily?
+### Switch between two tabs easily? Use Spacebar as your hotkey!
 
 ![Switch Demo](switch_demo.gif "switch between two tabs!")
 
@@ -30,6 +30,6 @@ your mouse!
 <br />
 <br />
 
-### Make a new tab of an open website?
+### Make a new tab of an open website? Add shift to your hotkey!
 
 ![Duplicate Demo](dupTab.gif "duplicate tabs if you want!")
