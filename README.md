@@ -45,7 +45,7 @@ your mouse!)
 ### Use
 
 1. Make sure your browser is not focused on any text input
-1. Hold down escape
+1. Hold down the _hold key_ (which is set to Escape by default)
 1. Type your hotkey (if you want to create a duplicate tab of a website you
    already have open, hope down shift while doing this step)
-1. Release escape
+1. Release the _hold key_
