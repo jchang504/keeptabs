@@ -10,14 +10,16 @@ your mouse!
 * Stop making tabs of websites that you already have open!
 * Stop searching through the haystack of tabs! No more 
 
-Need to...
+## Need to...
 
-* Switch to your usual websites?
+### Switch to your usual websites?
 
 ![Normal Demo](demo.gif "switch between tabs quickly!")
 
-* Switch between two tabs easily?
+### Switch between two tabs easily?
 
 ![Switch Demo](switch_demo.gif "switch between two tabs!")
 
-* Make a new tab of an open website?
+### Make a new tab of an open website?
+
+![Duplicate Demo](dupTab.gif "duplicate tabs if you want!")
