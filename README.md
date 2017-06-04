@@ -33,3 +33,19 @@ your mouse!)
 ### Make a new tab of an open website? Add shift to your hotkey!
 
 ![Duplicate Demo](dupTab.gif "duplicate tabs if you want!")
+
+## How to...
+
+### Install
+
+1. Download extension from the Google Chrome Web Store (it's free!)
+1. Restart Google Chrome
+1. Set up your hotkeys in the options page
+
+### Use
+
+1. Make sure your browser is not focused on any text input
+1. Hold down escape
+1. Type your hotkey (if you want to create a duplicate tab of a website you
+   already have open, hope down shift while doing this step)
+1. Release escape
