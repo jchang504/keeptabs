@@ -1,11 +1,11 @@
 # Keeptabs
     "Keep tabs on your tabs!" - Jemmin Chang
 
-* Navigate your tabs using hotkeys (quicker than you ever could with
+* **Navigate your tabs using hotkeys** (quicker than you ever could with
 your mouse!
-* Stop making tabs of websites that you already have open (you don't need 7
+* **Stop making tabs of websites that you already have open** (you don't need 7
         facebook tabs open!)
-* Stop searching through the haystack of tabs (especially when they're too thin
+* **Stop searching through the haystack of tabs** (especially when they're too thin
         to even show a logo!)
 
 ## Need to...
@@ -18,11 +18,13 @@ your mouse!
 <br />
 <br />
 <br />
+<br />
 
 ### Switch between two tabs easily? Use Spacebar as your hotkey!
 
 ![Switch Demo](switch_demo.gif "switch between two tabs!")
 
+<br />
 <br />
 <br />
 <br />
