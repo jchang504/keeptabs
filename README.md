@@ -2,7 +2,7 @@
     "Keep tabs on your tabs!" - Jemmin Chang
 
 * **Navigate your tabs using hotkeys** (quicker than you ever could with
-your mouse!
+your mouse!)
 * **Stop making tabs of websites that you already have open** (you don't need 7
         facebook tabs open!)
 * **Stop searching through the haystack of tabs** (especially when they're too thin
