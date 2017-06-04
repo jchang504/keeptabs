@@ -16,9 +16,15 @@ your mouse!
 
 ![Normal Demo](demo.gif "switch between tabs quickly!")
 
+<br />
+<br />
+
 ### Switch between two tabs easily?
 
 ![Switch Demo](switch_demo.gif "switch between two tabs!")
+
+<br />
+<br />
 
 ### Make a new tab of an open website?
 
