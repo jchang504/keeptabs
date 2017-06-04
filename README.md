@@ -18,11 +18,15 @@ your mouse!
 
 <br />
 <br />
+<br />
+<br />
 
 ### Switch between two tabs easily?
 
 ![Switch Demo](switch_demo.gif "switch between two tabs!")
 
+<br />
+<br />
 <br />
 <br />
 
