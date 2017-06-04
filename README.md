@@ -1,14 +1,12 @@
 # Keeptabs
     "Keep tabs on your tabs!" - Jemmin Chang
 
-## Navigate your tabs with hotkeys!
-
-## Don't ever deal with having 7 simultaneous Facebook tabs open ever again!
-
-* Navigate your tabs using your keyboard much quicker than you every could with
+* Navigate your tabs using hotkeys (quicker than you ever could with
 your mouse!
-* Stop making tabs of websites that you already have open!
-* Stop searching through the haystack of tabs! No more 
+* Stop making tabs of websites that you already have open (you don't need 7
+        facebook tabs open!)
+* Stop searching through the haystack of tabs (especially when they're too thin
+        to even show a logo!)
 
 ## Need to...
 
