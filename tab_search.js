@@ -95,6 +95,11 @@ function moveSelected(isUp){
     }
 }
 
+function scrollToSelected(){
+    $('html, body').animate({
+        scrollTop: $("."+selectedClassName).offset().top - 55
+    }, 100);
+}
 
 $(document).ready(function() {
     populate();
@@ -112,6 +117,7 @@ $(document).ready(function() {
             LOG_INFO("Arrow key detected");
             var isUp = e.which === ARROW_KEY_UP;
             moveSelected(isUp);
+            scrollToSelected();
         }
     });
 
