@@ -3,3 +3,9 @@
     color: black;
     margin-bottom:0px;
 }
+
+.favicon {
+    max-height: 1.2em;
+    max-width: 1.2em;
+    margin-right: 5px;
+}
