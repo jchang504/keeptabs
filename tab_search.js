@@ -62,7 +62,8 @@ function populate() {
             var jqRow = $("<tr></tr>");
             var jqTd = $("<td></td>").appendTo(jqRow);
             var jqTabItem = $("<a></a>").appendTo(jqTd);
-            jqTabItem.html(tab.url);
+            jqTabItem.append("<p class='result-title'>" + tab.title + "</p>");
+            jqTabItem.append(tab.url);
             jqTabItem.click(createClosure(tab));
             jqRow.appendTo(results);
         }
