@@ -8,7 +8,7 @@ your mouse!)
 * **Stop searching through the haystack of tabs** (especially when they're too thin
         to even show a logo!)
 
-## Need to...
+## Do you need to...
 
 ### Switch to your usual websites? Press the hotkeys that you set!
 
