@@ -96,6 +96,7 @@ function moveSelected(isUp){
 }
 
 function scrollToSelected(){
+    //Subtract 55 to include the search bar when you scroll to the top
     $('html, body').animate({
         scrollTop: $("."+selectedClassName).offset().top - 55
     }, 100);
