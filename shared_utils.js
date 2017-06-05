@@ -43,6 +43,10 @@ var TAB_SEARCH_SYMBOL = '/';
 var NAV_PREVIOUS_SYMBOL = ' ';
 // For tab search page.
 var ENTER_KEY_CODE = 13;
+var ARROW_KEY_LEFT = 37;
+var ARROW_KEY_RIGHT = 39;
+var ARROW_KEY_UP = 38;
+var ARROW_KEY_DOWN = 40;
 
 /* Extension page URLs */
 var SEARCH_URL = "tab_search.html";

@@ -2,7 +2,7 @@ html {
     min-width: 400px;
 }
 
-#results tr:first-child td {
+#results tr.selected td {
     background-color: #cfe3e8;
 }
 

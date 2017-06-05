@@ -8,6 +8,7 @@ var TITLE_KEY = "title"
 
 // Global state.
 var filtered_tabs = [];
+var selectedClassName = "selected";
 
 function closeSearchAndNavigate(tab_id, window_id) {
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
@@ -23,12 +24,12 @@ function closeSearchAndNavigate(tab_id, window_id) {
 }
 
 // Navigate to the first tab in the results list.
-function navigateToFirstResult(){
-    LOG_INFO("Navigate to first search result");
-    if (filtered_tabs && filtered_tabs.length > 0) {
-        var tab = filtered_tabs[0];
-        closeSearchAndNavigate(tab.id, tab.windowId);
-    }
+function navigateToSelectedResult(){
+    LOG_INFO("Navigate to selected search result");
+
+    var selectedIndex = $("tr." + selectedClassName).index();
+    var selectedTab = filtered_tabs[selectedIndex];
+    closeSearchAndNavigate(selectedTab.id, selectedTab.windowId);
 }
 
 // A hack necessary because of function-scope/closure weirdness of Javascript,
@@ -69,15 +70,49 @@ function populate() {
             jqTabItem.click(createClosure(tab));
             jqRow.appendTo(results);
         }
+
+        $("tr:first").addClass(selectedClassName);
     });
 }
+
+$.fn.loopNext = function(selector){
+    var selector = selector || '';
+    return this.next(selector).length ? this.next(selector) : this.siblings(selector).addBack(selector).first();
+}
+$.fn.loopPrev= function(selector){
+    var selector = selector || '';
+    return this.prev(selector).length ? this.prev(selector) : this.siblings(selector).addBack(selector).last();
+}
+
+function moveSelected(isUp){
+    var jqSelected = $("." + selectedClassName);
+    jqSelected.removeClass(selectedClassName);
+
+    if(isUp){
+        jqSelected.loopPrev().addClass(selectedClassName);
+    } else {
+        jqSelected.loopNext().addClass(selectedClassName);
+    }
+}
+
 
 $(document).ready(function() {
     populate();
     $(FUZZY_INPUT_SELECTOR).on(INPUT, populate);
     $(FUZZY_INPUT_SELECTOR).keypress(function(e){
+        //TODO: REMOVE THIS LOG
+        LOG_INFO(e.which);
         if (e.which == ENTER_KEY_CODE) {
-            navigateToFirstResult();
+            navigateToSelectedResult();
         }
     });
+    $(document).keydown(function(e){
+        if (e.which === ARROW_KEY_UP ||
+            e.which === ARROW_KEY_DOWN) {
+            LOG_INFO("Arrow key detected");
+            var isUp = e.which === ARROW_KEY_UP;
+            moveSelected(isUp);
+        }
+    });
+
 });
