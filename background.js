@@ -4,16 +4,16 @@ var domain_regex = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\
 // Global state.
 var hotkeys_map = {};
 var last_tab_id = null;
+var current_tab_id = null;
 // The last tab from which a tab search was launched via hotkey.
 var search_launch_tab_id = null;
 
 // Navigate to (make active) the specified tab (and focus its window, if the
-// optional argument is provided). Before navigating, update the last_tab_id.
+// optional argument is provided).
 function navigateToTab(tab_id, window_id) {
     LOG_INFO("Navigate to tab_id: " + tab_id + ", window_id: " + window_id);
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
             function(tabs) {
-        last_tab_id = tabs[0].id;
         chrome.tabs.update(tab_id, {[ACTIVE]: true});
         if (window_id !== undefined) {
             chrome.windows.update(window_id, {[FOCUSED]: true});
@@ -25,7 +25,6 @@ function navigateToTab(tab_id, window_id) {
 function createNewTab(url) {
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
             function(tabs) {
-        last_tab_id = tabs[0].id;
         LOG_INFO("Create new tab of: " + url);
         chrome.tabs.create({[URL]: url});
     });
@@ -128,6 +127,12 @@ function openTabSearch() {
         createNewTab(SEARCH_URL);
     });
 }
+
+// Listen for active tab changes to keep last_tab_id up to date.
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+    last_tab_id = current_tab_id;
+    current_tab_id = activeInfo.tabId;
+});
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Hold key event (pressed or released); broadcast to all tabs.
