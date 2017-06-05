@@ -17,7 +17,7 @@
     },
     "content_scripts": [{
         "matches": ["<all_urls>"],
-        "js": ["jquery-3.1.1.slim.min.js", "shared_utils.js", "hotkeys.js"],
+        "js": ["jquery-3.2.1.min.js", "shared_utils.js", "hotkeys.js"],
         "run_at": "document_start"
     }],
     "options_ui": {
