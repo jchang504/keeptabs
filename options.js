@@ -27,7 +27,9 @@ var HOTKEY_ENTRY_HTML = ' \
 function addHotkeyEntry() {
     $(HOTKEY_ENTRYS_TABLE_SELECTOR).append(HOTKEY_ENTRY_HTML);
     var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
-    jqHotkeyEntryRow.find(INPUTTABLE_ELEMENT_SELECTOR).change(enableSaveButton);
+    // Enable the save button on input or change (for checkboxes) events.
+    jqHotkeyEntryRow.find(INPUTTABLE_ELEMENT_SELECTOR).on(INPUT,
+            enableSaveButton).change(enableSaveButton);
     jqHotkeyEntryRow.find(HOTKEY_ENTRY_DELETE_SELECTOR).click(function() {
         jqHotkeyEntryRow.remove();
         enableSaveButton();
@@ -117,4 +119,5 @@ $(ADD_HOTKEY_ENTRY_BUTTON_SELECTOR).click(addHotkeyEntry);
 // Set up save button.
 $(OPTIONS_FORM_SELECTOR).submit(saveOptions);
 $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
-$(INPUTTABLE_ELEMENT_SELECTOR).change(enableSaveButton);
+// Enable the save button on input events.
+$(INPUTTABLE_ELEMENT_SELECTOR).on(INPUT, enableSaveButton);
