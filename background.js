@@ -104,11 +104,24 @@ function closeCurrentTab() {
     });
 }
 
+function updateHoldKey() {
+    LOG_INFO("Load hold key and update tabs' content scripts");
+    chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_DEFAULT}, function(items)
+            {
+        chrome.tabs.query({}, function(tabs) {
+            for (tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {[UPDATE_HOLD_KEY_MSG]:
+                        items[HOLD_KEY_KEY]});
+            }
+        });
+    });
+}
+
 // Load hotkeys from Chrome storage into global map.
 function loadHotkeys() {
     LOG_INFO("Load hotkeys");
     hotkeys_map = {};
-    chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items){
+    chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items) {
         for (hotkey_info of items[HOTKEYS_KEY]){
             hotkeys_map[hotkey_info[HOTKEY_KEY]] = {
                 [DOMAIN_KEY]: hotkey_info[DOMAIN_KEY],
@@ -150,25 +163,25 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     else if (request.hasOwnProperty(HOTKEY_MSG)) {
         var hotkey = request[HOTKEY_MSG];
         LOG_INFO("Received hotkey: " + hotkey);
-        if (hotkey == NAV_LEFT_SYMBOL){
+        if (hotkey == NAV_LEFT_KEYVAL){
             leftRightNavOrMove(-1, false);
         }
-        else if (hotkey == NAV_RIGHT_SYMBOL){
+        else if (hotkey == NAV_RIGHT_KEYVAL){
             leftRightNavOrMove(1, false);
         }
-        else if (hotkey == MOVE_LEFT_SYMBOL){
+        else if (hotkey == MOVE_LEFT_KEYVAL){
             leftRightNavOrMove(-1, true);
         }
-        else if (hotkey == MOVE_RIGHT_SYMBOL){
+        else if (hotkey == MOVE_RIGHT_KEYVAL){
             leftRightNavOrMove(1, true);
         }
-        else if (hotkey == TAB_CLOSE_SYMBOL) {
+        else if (hotkey == TAB_CLOSE_KEYVAL) {
             closeCurrentTab();
         }
-        else if (hotkey == TAB_SEARCH_SYMBOL) {
+        else if (hotkey == TAB_SEARCH_KEYVAL) {
             openTabSearch();
         }
-        else if (hotkey == NAV_PREVIOUS_SYMBOL) {
+        else if (hotkey == NAV_PREVIOUS_KEYVAL) {
             navigateToPreviousTab();
         }
         else {
@@ -186,9 +199,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             }
         }
     }
-    // Refresh hotkeys after options edit.
+    // Refresh options after edit.
     else if (request.hasOwnProperty(REFRESH_MSG)) {
-        LOG_INFO("Refresh hotkeys");
+        LOG_INFO("Received refresh request");
+        updateHoldKey();
         loadHotkeys();
     }
     // Navigate to tab from tab search selection.

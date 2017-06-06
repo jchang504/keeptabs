@@ -3,6 +3,7 @@ var HOLDKEY_MSG = "holdKey";
 var HOTKEY_MSG = "hotkey";
 var REFRESH_MSG = "refresh";
 var SEARCH_NAV_MSG = "search_nav";
+var UPDATE_HOLD_KEY_MSG = "update_hold_key";
 var TAB_ID_KEY = "tab_id";
 var WINDOW_ID_KEY = "window_id";
 var CURRENT_TAB_KEY = "current_tab";
@@ -15,43 +16,26 @@ var FOCUSED = "focused";
 var URL = "url";
 var INDEX = "index";
 
-/* Key codes + symbols */
-// TODO: Allow customization. For now:
-// 27 = Esc
-// 91 = [
-// 93 = ]
-// 123 = {
-// 125 = }
-// 59 = ;
-// 47 = /
-// 32 = space
-var HOTKEY_HOLD_KEY_CODE = 27;
-var NAV_LEFT_KEY_CODE = 91;
-var NAV_RIGHT_KEY_CODE = 93;
-var MOVE_LEFT_KEY_CODE = 123;
-var MOVE_RIGHT_KEY_CODE = 125;
-var TAB_CLOSE_KEY_CODE = 59;
-var TAB_SEARCH_KEY_CODE = 47;
-var NAV_PREVIOUS_KEY_CODE = 32;
-// Hotkey symbols.
-var NAV_LEFT_SYMBOL = '[';
-var NAV_RIGHT_SYMBOL = ']';
-var MOVE_LEFT_SYMBOL = '{';
-var MOVE_RIGHT_SYMBOL = '}';
-var TAB_CLOSE_SYMBOL = ';';
-var TAB_SEARCH_SYMBOL = '/';
-var NAV_PREVIOUS_SYMBOL = ' ';
+/* Chrome e.key values */
+// TODO: Allow customization of these.
+var NAV_LEFT_KEYVAL = "[";
+var NAV_RIGHT_KEYVAL = "]";
+var MOVE_LEFT_KEYVAL = "{";
+var MOVE_RIGHT_KEYVAL = "}";
+var TAB_CLOSE_KEYVAL = ";";
+var TAB_SEARCH_KEYVAL = "/";
+var NAV_PREVIOUS_KEYVAL = " ";
 // For tab search page.
-var ENTER_KEY_CODE = 13;
-var ARROW_KEY_LEFT = 37;
-var ARROW_KEY_RIGHT = 39;
-var ARROW_KEY_UP = 38;
-var ARROW_KEY_DOWN = 40;
+var ENTER_KEYVAL = "Enter";
+var ARROW_UP_KEYVAL = "ArrowUp";
+var ARROW_DOWN_KEYVAL = "ArrowDown";
 
 /* Extension page URLs */
 var SEARCH_URL = "tab_search.html";
 
 /* Chrome storage keys and default values */
+var HOLD_KEY_KEY = "hold_key";
+var HOLD_KEY_DEFAULT = "Escape";
 var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
 var DOMAIN_KEY = "domain";

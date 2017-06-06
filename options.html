@@ -2,47 +2,46 @@
 <html>
 <head>
     <title>KeepTabs Options</title>
-    <link rel="stylesheet" href="css/foundation.css">
-
-    <style>
-    h1{
-    margin: 30;
-    }
-
-    body {
-    background-image: url("icons/optionsbg.png");
-    background-size: 100%;
-    font-size: 13px;
-    margin:30;
-    } 
-
-    </style>
-
+    <link rel="stylesheet" type="text/css" href="css/foundation.css">
+    <link rel="stylesheet" type="text/css" href="options.css">
 </head>
 <body>
     <h1>KeepTabs Options</h1>
-
-    <p>
-    Organize your hotkeys here. <br/>
-
-    The <strong>domain</strong> saved here will have a shortcut to switch to or 
-    create the corresponding tab (e.g. facebook.com, google.com). <br/ >
-    The <strong>HotKey</strong> entry is linked to which hotkeys pressed will 
-    navigate you to the corresponding domain (e.g. ",,f" to open facebook).
-    Checking the <strong>Deduplicate</strong> option will bring you back to an existing window if you have one already opened.
-    </p>
-
     <form id="options">
-
-    <table id="hotkey_entry"><tbody>
-        <tr>
-            <th>Domain</th>
-            <th>HotKey</th>
-            <th>Deduplicate</th>
-        </tr>
-    </tbody></table>
-    <button id="add_hotkey">Add HotKeys</button>
-    <input id="save" type="submit" value="Save all">
+        <h2>Set hold key</h2>
+        <p id="hold_key_description">The <strong>hold key</strong> is the key
+        you hold while typing to activate your hotkeys. If it is used for
+        native shortcuts in Chrome (e.g. Ctrl+f on Windows), creating an
+        overlapping hotkey may or may not override the native shortcut.
+        Operating system shortcuts, however, will not get overridden, so choose
+        your hold key carefully to avoid side effects.</p>
+        <select id="hold_key">
+            <!-- Values are Chrome e.key values -->
+            <option value="Escape">Escape</option>
+            <option value="Control">Control</option>
+            <option value="Alt">Alt/Option (Mac)</option>
+            <option value="Meta">Windows key/Cmd (Mac)</option>
+            <option value="ContextMenu">Context menu key (Windows only)</option>
+        </select>
+        <h2>Customize hotkeys</h2>
+        <p>
+            The <strong>domain</strong> saved here will have a shortcut to
+            switch to or create the corresponding tab (e.g. facebook.com,
+            google.com). The <strong>HotKey</strong> entry is linked to which
+            hotkeys pressed will navigate you to the corresponding domain (e.g.
+            "<HOLD>f" to open facebook).  Checking the
+            <strong>Deduplicate</strong> option will bring you back to an
+            existing window if you have one already opened.
+        </p>
+        <table id="hotkey_entry"><tbody>
+            <tr>
+                <th>Domain</th>
+                <th>HotKey</th>
+                <th>Deduplicate</th>
+            </tr>
+        </tbody></table>
+        <button id="add_hotkey">Add HotKeys</button>
+        <input id="save" type="submit" value="Save all">
     </form>
 
     <script src="jquery-3.2.1.min.js"></script>

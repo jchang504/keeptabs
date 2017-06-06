@@ -106,17 +106,15 @@ $(document).ready(function() {
     populate();
     $(FUZZY_INPUT_SELECTOR).on(INPUT, populate);
     $(FUZZY_INPUT_SELECTOR).keypress(function(e){
-        //TODO: REMOVE THIS LOG
-        LOG_INFO(e.which);
-        if (e.which == ENTER_KEY_CODE) {
+        if (e.key == ENTER_KEYVAL) {
             navigateToSelectedResult();
         }
     });
     $(document).keydown(function(e){
-        if (e.which === ARROW_KEY_UP ||
-            e.which === ARROW_KEY_DOWN) {
+        if (e.key === ARROW_UP_KEYVAL ||
+            e.key === ARROW_DOWN_KEYVAL) {
             LOG_INFO("Arrow key detected");
-            var isUp = e.which === ARROW_KEY_UP;
+            var isUp = e.key === ARROW_UP_KEYVAL;
             moveSelected(isUp);
             scrollToSelected();
         }

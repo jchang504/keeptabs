@@ -1,9 +1,10 @@
 // CSS selectors.
+var HOLD_KEY_SELECTOR = "#hold_key";
 var HOTKEY_ENTRYS_TABLE_SELECTOR = '#hotkey_entry > tbody';
 var HOTKEY_ENTRY_ROWS_SELECTOR = '#hotkey_entry tr:not(:first-child)';
 var HOTKEY_ENTRY_LAST_ROW_SELECTOR = '#hotkey_entry tr:last-child';
 var HOTKEY_ENTRY_DELETE_SELECTOR = 'button.delete';
-var INPUT_SELECTOR = 'input';
+var INPUTTABLE_ELEMENT_SELECTOR = 'input,select';
 var INPUT_TEXT_SELECTOR = 'input[type="text"]';
 var INPUT_DOMAIN_SELECTOR = 'input[name="domain"]';
 var INPUT_HOTKEY_SELECTOR = 'input[name="hotkey"]';
@@ -26,7 +27,7 @@ var HOTKEY_ENTRY_HTML = ' \
 function addHotkeyEntry() {
     $(HOTKEY_ENTRYS_TABLE_SELECTOR).append(HOTKEY_ENTRY_HTML);
     var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
-    jqHotkeyEntryRow.find(INPUT_SELECTOR).change(enableSaveButton);
+    jqHotkeyEntryRow.find(INPUTTABLE_ELEMENT_SELECTOR).change(enableSaveButton);
     jqHotkeyEntryRow.find(HOTKEY_ENTRY_DELETE_SELECTOR).click(function() {
         jqHotkeyEntryRow.remove();
         enableSaveButton();
@@ -77,8 +78,10 @@ function restoreHotkeyEntrys(hotkeys) {
 
 // Saves options to chrome.storage.sync.
 function saveOptions() {
+    var holdKey = $(HOLD_KEY_SELECTOR).val();
     var hotkeys = getHotkeyEntrys();
     chrome.storage.sync.set({
+        [HOLD_KEY_KEY]: holdKey,
         [HOTKEYS_KEY]: hotkeys
     }, function() {
         LOG_INFO("Sending refresh request to background script");
@@ -92,7 +95,11 @@ function saveOptions() {
 // Restores options as previously stored in chrome.storage.sync.
 function restoreOptions() {
     // Default values.
-    chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items) {
+    chrome.storage.sync.get({
+            [HOLD_KEY_KEY]: HOLD_KEY_DEFAULT,
+            [HOTKEYS_KEY]: HOTKEYS_DEFAULT
+            }, function(items) {
+        $(HOLD_KEY_SELECTOR).val(items[HOLD_KEY_KEY]);
         restoreHotkeyEntrys(items[HOTKEYS_KEY]);
     });
 }
@@ -110,4 +117,4 @@ $(ADD_HOTKEY_ENTRY_BUTTON_SELECTOR).click(addHotkeyEntry);
 // Set up save button.
 $(OPTIONS_FORM_SELECTOR).submit(saveOptions);
 $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
-$(INPUT_SELECTOR).change(enableSaveButton);
+$(INPUTTABLE_ELEMENT_SELECTOR).change(enableSaveButton);

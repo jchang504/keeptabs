@@ -1,15 +1,28 @@
 // Global state.
+// This gets updated by reading from storage before key event handlers are
+// attached. See bottom.
+var hold_key = null;
 var holding = false;
-var hotkey = '';
+var hotkey = "";
 
 function sendHotkeyMessage(hotkey) {
     LOG_INFO("Send hotkey: " + hotkey);
     chrome.runtime.sendMessage({[HOTKEY_MSG]: hotkey});
 }
 
+BUILT_IN_HOTKEYS = [
+    NAV_LEFT_KEYVAL,
+    NAV_RIGHT_KEYVAL,
+    MOVE_LEFT_KEYVAL,
+    MOVE_RIGHT_KEYVAL,
+    TAB_CLOSE_KEYVAL,
+    TAB_SEARCH_KEYVAL,
+    NAV_PREVIOUS_KEYVAL
+];
+
 function keydownHandler(e) {
     // When hold key pressed, block text entry and wait for hotkey.
-    if (e.which == HOTKEY_HOLD_KEY_CODE) {
+    if (e.key == hold_key) {
         if (!holding) {
             LOG_INFO("Holding for hotkey...");
             chrome.runtime.sendMessage({[HOLDKEY_MSG]: true});
@@ -19,50 +32,35 @@ function keydownHandler(e) {
         e.preventDefault();
     }
     if (holding) {
+        // Capture [A-Za-z].
+        var ascii_value = e.key.charCodeAt(0);
+        if (e.key.length == 1 &&
+            65 <= ascii_value && ascii_value <= 90 ||
+            97 <= ascii_value && ascii_value <= 122) {
+                hotkey += e.key;
+        }
+        // Capture built-in hotkeys. Send them immediately so that the user can
+        // repeatedly use them without releasing the hold key.
+        else if (BUILT_IN_HOTKEYS.includes(e.key)) {
+            sendHotkeyMessage(e.key);
+            hotkey = "";
+        }
         e.stopPropagation();
+        e.preventDefault();
     }
 }
 
 function keyupHandler(e) {
     // When hold key released, unblock text entry and send any hotkey entered.
-    if (e.which == HOTKEY_HOLD_KEY_CODE) {
+    if (e.key == hold_key) {
         if (hotkey.length > 0) {
             sendHotkeyMessage(hotkey);
-            hotkey = '';
+            hotkey = "";
         }
         e.stopPropagation();
         LOG_INFO("Released for hotkey.");
         chrome.runtime.sendMessage({[HOLDKEY_MSG]: false});
         holding = false;
-    }
-}
-
-// Mapping of special hotkey key codes to message symbols.
-SPECIAL_KEY_CODE_TO_SYMBOL = {
-    [NAV_LEFT_KEY_CODE]: NAV_LEFT_SYMBOL,
-    [NAV_RIGHT_KEY_CODE]: NAV_RIGHT_SYMBOL,
-    [MOVE_LEFT_KEY_CODE]: MOVE_LEFT_SYMBOL,
-    [MOVE_RIGHT_KEY_CODE]: MOVE_RIGHT_SYMBOL,
-    [TAB_CLOSE_KEY_CODE]: TAB_CLOSE_SYMBOL,
-    [TAB_SEARCH_KEY_CODE]: TAB_SEARCH_SYMBOL,
-    [NAV_PREVIOUS_KEY_CODE]: NAV_PREVIOUS_SYMBOL
-}
-
-function keypressHandler(e) {
-    if (holding) {
-        // Capture [A-Za-z].
-        if (65 <= e.keyCode && e.keyCode <= 90 || 
-            97 <= e.keyCode && e.keyCode <= 122) {
-            hotkey += String.fromCharCode(e.keyCode);
-        }
-        // Capture special hotkeys. Send them immediately so that the user can
-        // repeatedly use them without releasing the hold key.
-        else if (e.keyCode in SPECIAL_KEY_CODE_TO_SYMBOL) {
-            sendHotkeyMessage(SPECIAL_KEY_CODE_TO_SYMBOL[e.keyCode]);
-            hotkey = '';
-        }
-        e.stopPropagation();
-        e.preventDefault();
     }
 }
 
@@ -73,8 +71,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         var hold_event_type = holding ? "pressed" : "released";
         LOG_INFO("Received hold key " + hold_event_type);
     }
+    else if (request.hasOwnProperty(UPDATE_HOLD_KEY_MSG)) {
+        hold_key = request[UPDATE_HOLD_KEY_MSG];
+    }
 });
 
-$(window).get(0).addEventListener(KEYDOWN, keydownHandler, true);
-$(window).get(0).addEventListener(KEYUP, keyupHandler, true);
-$(window).get(0).addEventListener(KEYPRESS, keypressHandler, true);
+chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_DEFAULT}, function(items) {
+    hold_key = items[HOLD_KEY_KEY];
+    // Only add listeners once hold_key has been updated from options.
+    $(window).get(0).addEventListener(KEYDOWN, keydownHandler, true);
+    $(window).get(0).addEventListener(KEYUP, keyupHandler, true);
+});

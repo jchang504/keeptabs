@@ -1,0 +1,9 @@
+body {
+    background-image: url("icons/optionsbg.png");
+    background-size: 100%;
+    margin: 1em;
+}
+
+#hold_key_description {
+    margin-bottom: 10px;
+}
