@@ -3,6 +3,11 @@ var domain_regex = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\
 
 // Global state.
 var hotkeys_map = {};
+var last_window_id = null;
+var current_window_id = null;
+var window_to_active_tab_map = {};
+// These tab ids are tracked only for navigating to the previous tab within the
+// current window.
 var last_tab_id = null;
 var current_tab_id = null;
 // The last tab from which a tab search was launched via hotkey.
@@ -85,15 +90,19 @@ function leftRightNavOrMove(direction, move) {
 // Navigate to the previous tab that was navigated to with KeepTabs. Useful for
 // quick alt+tab style switching between two tabs.
 function navigateToPreviousTab() {
-    LOG_INFO("Navigate to previous tab");
-    chrome.tabs.query({}, function(tabs) {
-        for (tab of tabs) {
-            if (tab.id == last_tab_id) {
-                // If last_tab_id is valid, navigate to it.
-                navigateToTab(tab.id, tab.windowId);
-            }
+    if (last_window_id != null) {
+        LOG_INFO("Navigate to previous tab");
+        // If last tab change was within same window, just switch tabs.
+        if (last_window_id == current_window_id) {
+            navigateToTab(last_tab_id);
         }
-    });
+        // If last tab change was across windows, switch to last window and its
+        // active tab.
+        else {
+            navigateToTab(window_to_active_tab_map[last_window_id],
+                    last_window_id);
+        }
+    }
 }
 
 function closeCurrentTab() {
@@ -141,10 +150,39 @@ function openTabSearch() {
     });
 }
 
-// Listen for active tab changes to keep last_tab_id up to date.
+// Listen for focused window changes to keep last_window_id up to date.
+chrome.windows.onFocusChanged.addListener(function (window_id) {
+    // Track last focused window; ignore when user is not on any window.
+    if (window_id != chrome.windows.WINDOW_ID_NONE) {
+        last_window_id = current_window_id;
+        current_window_id = window_id;
+        LOG_INFO("Update last_window_id=" + last_window_id +
+                "; current_window_id=" + current_window_id);
+    }
+},
+// Exclude 'app' and 'panel' WindowType (extension's own windows).
+{windowTypes: ["normal", "popup"]});
+
+// Listen for window closures to keep window_to_active_tab_map from growing
+// infinitely.
+chrome.windows.onRemoved.addListener(function (window_id) {
+    delete window_to_active_tab_map[window_id];
+},
+// Exclude 'app' and 'panel' WindowType (extension's own windows).
+{windowTypes: ["normal", "popup"]});
+
+// Listen for active tab changes (within a window) to keep last_tab_id,
+// last_window_id, and window_to_active_tab_map up to date.
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     last_tab_id = current_tab_id;
     current_tab_id = activeInfo.tabId;
+    LOG_INFO("Update last_tab_id=" + last_tab_id + "; current_tab_id=" +
+            current_tab_id);
+    // Consider it a window "change" as well, so we can know that the last tab
+    // was within the current window.
+    last_window_id = current_window_id;
+    LOG_INFO("Update last_window_id=" + last_window_id);
+    window_to_active_tab_map[activeInfo.windowId] = activeInfo.tabId;
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
