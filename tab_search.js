@@ -8,7 +8,7 @@ var TITLE_KEY = "title"
 
 // Global state.
 var filtered_tabs = [];
-var selectedClassName = "selected";
+var SELECTED_CLASS_NAME = "selected";
 
 function closeSearchAndNavigate(tab_id, window_id) {
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
@@ -27,7 +27,7 @@ function closeSearchAndNavigate(tab_id, window_id) {
 function navigateToSelectedResult(){
     LOG_INFO("Navigate to selected search result");
 
-    var selectedIndex = $("tr." + selectedClassName).index();
+    var selectedIndex = $("tr." + SELECTED_CLASS_NAME).index();
     var selectedTab = filtered_tabs[selectedIndex];
     closeSearchAndNavigate(selectedTab.id, selectedTab.windowId);
 }
@@ -71,7 +71,7 @@ function populate() {
             jqRow.appendTo(results);
         }
 
-        $("tr:first").addClass(selectedClassName);
+        $("tr:first").addClass(SELECTED_CLASS_NAME);
     });
 }
 
@@ -85,20 +85,20 @@ $.fn.loopPrev= function(selector){
 }
 
 function moveSelected(isUp){
-    var jqSelected = $("." + selectedClassName);
-    jqSelected.removeClass(selectedClassName);
+    var jqSelected = $("." + SELECTED_CLASS_NAME);
+    jqSelected.removeClass(SELECTED_CLASS_NAME);
 
     if(isUp){
-        jqSelected.loopPrev().addClass(selectedClassName);
+        jqSelected.loopPrev().addClass(SELECTED_CLASS_NAME);
     } else {
-        jqSelected.loopNext().addClass(selectedClassName);
+        jqSelected.loopNext().addClass(SELECTED_CLASS_NAME);
     }
 }
 
 function scrollToSelected(){
     //Subtract 55 to include the search bar when you scroll to the top
     $('html, body').animate({
-        scrollTop: $("."+selectedClassName).offset().top - 55
+        scrollTop: $("."+SELECTED_CLASS_NAME).offset().top - 55
     }, 100);
 }
 
