@@ -75,10 +75,19 @@ function populate() {
     });
 }
 
+/* This function is just a wrapper function for the jquery function
+ * next(selector) except that it wraps around to the beginning of the list of
+ * siblings if you reach the end. 
+ */
 $.fn.loopNext = function(selector){
     var selector = selector || '';
     return this.next(selector).length ? this.next(selector) : this.siblings(selector).addBack(selector).first();
 }
+
+/* This function is just a wrapper function for the jquery function
+ * prev(selector) except that it wraps around to the beginning of the list of
+ * siblings if you reach the beginning. 
+ */
 $.fn.loopPrev= function(selector){
     var selector = selector || '';
     return this.prev(selector).length ? this.prev(selector) : this.siblings(selector).addBack(selector).last();
