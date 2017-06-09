@@ -122,7 +122,6 @@ $(document).ready(function() {
     $(document).keydown(function(e){
         if (e.key === ARROW_UP_KEYVAL ||
             e.key === ARROW_DOWN_KEYVAL) {
-            LOG_INFO("Arrow key detected");
             var isUp = e.key === ARROW_UP_KEYVAL;
             moveSelected(isUp);
             scrollToSelected();
