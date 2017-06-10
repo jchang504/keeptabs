@@ -7,7 +7,7 @@ var URL_KEY = "url"
 var TITLE_KEY = "title"
 
 // Global state.
-var MAX_TITLE_LENGTH = 60;
+var MAX_TITLE_LENGTH = 90;
 var filtered_tabs = [];
 var SELECTED_CLASS_NAME = "selected";
 
