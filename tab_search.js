@@ -7,6 +7,7 @@ var URL_KEY = "url"
 var TITLE_KEY = "title"
 
 // Global state.
+var MAX_TITLE_LENGTH = 60;
 var filtered_tabs = [];
 var SELECTED_CLASS_NAME = "selected";
 
@@ -65,7 +66,13 @@ function populate() {
             var jqTabItem = $("<a></a>").appendTo(jqTd);
             var jqTabHeader = $("<p class='result-title'></p>").appendTo(jqTabItem);
             jqTabHeader.append("<img class='favicon' src=" + tab.favIconUrl + ">");
-            jqTabHeader.append(tab.title);
+            if (tab.title.length > MAX_TITLE_LENGTH) {
+                var formattedTitle = tab.title.substring(0, MAX_TITLE_LENGTH) + "...";
+            }
+            else {
+                formattedTitle = tab.title
+            }
+            jqTabHeader.append(formattedTitle);
             jqTabItem.append(tab.url);
             jqTabItem.click(createClosure(tab));
             jqRow.appendTo(results);
