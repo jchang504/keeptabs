@@ -70,7 +70,7 @@ function populate() {
                 var formattedTitle = tab.title.substring(0, MAX_TITLE_LENGTH) + "...";
             }
             else {
-                formattedTitle = tab.title
+                var formattedTitle = tab.title;
             }
             jqTabHeader.append(formattedTitle);
             jqTabItem.append(tab.url);
