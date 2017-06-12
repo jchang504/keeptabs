@@ -8,6 +8,7 @@ var TITLE_KEY = "title"
 
 // Global state.
 var MAX_TITLE_LENGTH = 90;
+var MAX_URL_LENGTH = 70;
 var filtered_tabs = [];
 var SELECTED_CLASS_NAME = "selected";
 
@@ -73,7 +74,13 @@ function populate() {
                 var formattedTitle = tab.title;
             }
             jqTabHeader.append(formattedTitle);
-            jqTabItem.append(tab.url);
+            if (tab.url.length > MAX_URL_LENGTH) {
+                var formattedUrl = tab.url.substring(0, MAX_URL_LENGTH) + "...";
+            }
+            else {
+                var formattedUrl = tab.url;
+            }
+            jqTabItem.append(formattedUrl);
             jqTabItem.click(createClosure(tab));
             jqRow.appendTo(results);
         }
