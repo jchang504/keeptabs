@@ -1,29 +1,27 @@
 // Regex for domain matching.
-var domain_regex = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)', 'i');
+var DOMAIN_REGEX = new RegExp('^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)', 'i');
+var TAB_HISTORY_LIMIT = 10;
 
 // Global state.
 var hotkeys_map = {};
-var last_window_id = null;
-var current_window_id = null;
+// A bounded array containing the IDs of the last TAB_HISTORY_LIMIT active
+// tabs. The current tab is at current_tab_index, and the rest follow in
+// descending indices, wrapping around the beginning of the array to the end.
+// Used for last tab navigation.
+var tab_history = [];
+var current_tab_index = 0;
+// Necessary to keep track of the last active tab when only the focused window
+// changes (this does NOT fire the active tab change listener).
 var window_to_active_tab_map = {};
-// These tab ids are tracked only for navigating to the previous tab within the
-// current window.
-var last_tab_id = null;
-var current_tab_id = null;
-// The last tab from which a tab search was launched via hotkey.
-var search_launch_tab_id = null;
 
 // Navigate to (make active) the specified tab (and focus its window, if the
 // optional argument is provided).
 function navigateToTab(tab_id, window_id) {
     LOG_INFO("Navigate to tab_id: " + tab_id + ", window_id: " + window_id);
-    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-            function(tabs) {
-        chrome.tabs.update(tab_id, {[ACTIVE]: true});
-        if (window_id !== undefined) {
-            chrome.windows.update(window_id, {[FOCUSED]: true});
-        }
-    });
+    chrome.tabs.update(tab_id, {[ACTIVE]: true});
+    if (window_id !== undefined) {
+        chrome.windows.update(window_id, {[FOCUSED]: true});
+    }
 }
 
 // Create a new tab of the url (and navigate to it). Also used for tab search.
@@ -44,11 +42,11 @@ function createNewTab(url) {
  */
 function openTab(url, deduplicate){
     chrome.tabs.query({}, function(tabs){
-        var target_domain = domain_regex.exec(url)[1];
+        var target_domain = DOMAIN_REGEX.exec(url)[1];
         if (deduplicate) {
             for (tab of tabs){
                 var tab_url = tab.url;
-                var tab_domain = domain_regex.exec(tab_url)[1];
+                var tab_domain = DOMAIN_REGEX.exec(tab_url)[1];
                 if (target_domain == tab_domain) {
                     LOG_INFO("Switch active tab to: " + tab_url);
                     navigateToTab(tab.id, tab.windowId);
@@ -65,19 +63,19 @@ function openTab(url, deduplicate){
  */
 function leftRightNavOrMove(direction, move) {
     chrome.tabs.query({[CURRENT_WINDOW]: true}, function(tabs) {
-        var curr_tab_index;
+        var current_tab_index;
         for (tab of tabs) {
             if (tab.active) {
-                curr_tab_index = tab.index;
+                current_tab_index = tab.index;
                 break;
             }
         }
         var length = tabs.length;
-        var next_tab_index = (curr_tab_index + length + direction) % length;
+        var next_tab_index = (current_tab_index + length + direction) % length;
         var label = direction == -1 ? "left" : "right";
         if (move) {
             LOG_INFO("Move current tab " + label);
-            chrome.tabs.move(tabs[curr_tab_index].id, {[INDEX]:
+            chrome.tabs.move(tabs[current_tab_index].id, {[INDEX]:
                     next_tab_index});
         }
         else {
@@ -85,24 +83,6 @@ function leftRightNavOrMove(direction, move) {
             navigateToTab(tabs[next_tab_index].id);
         }
     });
-}
-
-// Navigate to the previous tab that was navigated to with KeepTabs. Useful for
-// quick alt+tab style switching between two tabs.
-function navigateToPreviousTab() {
-    if (last_window_id != null) {
-        LOG_INFO("Navigate to previous tab");
-        // If last tab change was within same window, just switch tabs.
-        if (last_window_id == current_window_id) {
-            navigateToTab(last_tab_id);
-        }
-        // If last tab change was across windows, switch to last window and its
-        // active tab.
-        else {
-            navigateToTab(window_to_active_tab_map[last_window_id],
-                    last_window_id);
-        }
-    }
 }
 
 function closeCurrentTab() {
@@ -143,21 +123,46 @@ function loadHotkeys() {
 // Open a new tab of the tab search page.
 function openTabSearch() {
     LOG_INFO("Open tab search");
-    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-            function(tabs) {
-        search_launch_tab_id = tabs[0].id;
-        createNewTab(SEARCH_URL);
+    createNewTab(SEARCH_URL);
+}
+
+// Navigate to the previous tab that was navigated to with KeepTabs. Useful for
+// quick alt+tab style switching between two tabs.
+function navigateToPreviousTab() {
+    LOG_INFO("Navigate to previous tab");
+    var current_tab_id = tab_history[current_tab_index];
+    chrome.tabs.query({}, function(tabs) {
+        var done = false;
+        for (var i = current_tab_index; !done && i != current_tab_index + 1;
+                i = (i + TAB_HISTORY_LIMIT - 1) % TAB_HISTORY_LIMIT) {
+            var tab_id = tab_history[i];
+            if (tab_id != current_tab_id) {
+                // Check if tab still exists.
+                for (tab of tabs) {
+                    if (tab.id == tab_id) {
+                        navigateToTab(tab_id, tab.windowId);
+                        done = true;
+                        break;
+                    }
+                }
+            }
+        }
     });
 }
 
-// Listen for focused window changes to keep last_window_id up to date.
+// Add an entry for tab_id as most recent in the active tab history.
+function addToTabHistory(tab_id) {
+    LOG_INFO("Add to tab history: tab_id=" + tab_id);
+    current_tab_index = (current_tab_index + 1) % TAB_HISTORY_LIMIT;
+    tab_history[current_tab_index] = tab_id;
+}
+
+// Listen for focused window changes to track active tab changes across
+// windows.
 chrome.windows.onFocusChanged.addListener(function (window_id) {
     // Track last focused window; ignore when user is not on any window.
     if (window_id != chrome.windows.WINDOW_ID_NONE) {
-        last_window_id = current_window_id;
-        current_window_id = window_id;
-        LOG_INFO("Update last_window_id=" + last_window_id +
-                "; current_window_id=" + current_window_id);
+        addToTabHistory(window_to_active_tab_map[window_id]);
     }
 },
 // Exclude 'app' and 'panel' WindowType (extension's own windows).
@@ -171,17 +176,9 @@ chrome.windows.onRemoved.addListener(function (window_id) {
 // Exclude 'app' and 'panel' WindowType (extension's own windows).
 {windowTypes: ["normal", "popup"]});
 
-// Listen for active tab changes (within a window) to keep last_tab_id,
-// last_window_id, and window_to_active_tab_map up to date.
+// Listen for active tab changes (within a window).
 chrome.tabs.onActivated.addListener(function (activeInfo) {
-    last_tab_id = current_tab_id;
-    current_tab_id = activeInfo.tabId;
-    LOG_INFO("Update last_tab_id=" + last_tab_id + "; current_tab_id=" +
-            current_tab_id);
-    // Consider it a window "change" as well, so we can know that the last tab
-    // was within the current window.
-    last_window_id = current_window_id;
-    LOG_INFO("Update last_window_id=" + last_window_id);
+    addToTabHistory(activeInfo.tabId);
     window_to_active_tab_map[activeInfo.windowId] = activeInfo.tabId;
 });
 
@@ -242,21 +239,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         LOG_INFO("Received refresh request");
         updateHoldKey();
         loadHotkeys();
-    }
-    // Navigate to tab from tab search selection.
-    else if (request.hasOwnProperty(SEARCH_NAV_MSG)) {
-        LOG_INFO("Received navigation request from tab search");
-        chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-                function(tabs) {
-            var calledFromPopup = tabs[0].id == request[CURRENT_TAB_KEY];
-            if (!calledFromPopup) {
-                // If tab search launched via hotkey, return to launching tab
-                // after closing tab search tab.
-                LOG_INFO("Search launched by hotkey; return to launching tab.");
-                chrome.tabs.update(search_launch_tab_id, {[ACTIVE]: true});
-            }
-            navigateToTab(request[TAB_ID_KEY], request[WINDOW_ID_KEY]);
-        });
     }
 });
 

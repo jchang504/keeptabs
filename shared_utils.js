@@ -2,11 +2,9 @@
 var HOLDKEY_MSG = "holdKey";
 var HOTKEY_MSG = "hotkey";
 var REFRESH_MSG = "refresh";
-var SEARCH_NAV_MSG = "search_nav";
 var UPDATE_HOLD_KEY_MSG = "update_hold_key";
 var TAB_ID_KEY = "tab_id";
 var WINDOW_ID_KEY = "window_id";
-var CURRENT_TAB_KEY = "current_tab";
 
 // Chrome tabs API functions options keys.
 var ACTIVE = "active";

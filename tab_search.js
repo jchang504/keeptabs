@@ -13,16 +13,10 @@ var filtered_tabs = [];
 var SELECTED_CLASS_NAME = "selected";
 
 function closeSearchAndNavigate(tab_id, window_id) {
-    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-            function(tabs) {
-        // Close search tab.
-        window.close();
-        // Send message to background script with tab to navigate to and current
-        // tab id.
-        chrome.runtime.sendMessage({[SEARCH_NAV_MSG]: true,
-                [TAB_ID_KEY]: tab_id, [WINDOW_ID_KEY]: window_id,
-                [CURRENT_TAB_KEY]: tabs[0].id});
-    });
+    // Close search tab.
+    window.close();
+    chrome.tabs.update(tab_id, {[ACTIVE]: true});
+    chrome.windows.update(window_id, {[FOCUSED]: true});
 }
 
 // Navigate to the first tab in the results list.
