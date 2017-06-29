@@ -1,5 +1,5 @@
 /* Messaging request keys */
-var HOLDKEY_MSG = "holdKey";
+var HOLD_KEY_MSG = "hold_key";
 var HOTKEY_MSG = "hotkey";
 var REFRESH_MSG = "refresh";
 var UPDATE_HOLD_KEY_MSG = "update_hold_key";

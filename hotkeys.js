@@ -1,3 +1,13 @@
+var BUILT_IN_HOTKEYS = [
+    NAV_LEFT_KEYVAL,
+    NAV_RIGHT_KEYVAL,
+    MOVE_LEFT_KEYVAL,
+    MOVE_RIGHT_KEYVAL,
+    TAB_CLOSE_KEYVAL,
+    TAB_SEARCH_KEYVAL,
+    NAV_PREVIOUS_KEYVAL
+];
+
 // Global state.
 // This gets updated by reading from storage before key event handlers are
 // attached. See bottom.
@@ -10,22 +20,12 @@ function sendHotkeyMessage(hotkey) {
     chrome.runtime.sendMessage({[HOTKEY_MSG]: hotkey});
 }
 
-BUILT_IN_HOTKEYS = [
-    NAV_LEFT_KEYVAL,
-    NAV_RIGHT_KEYVAL,
-    MOVE_LEFT_KEYVAL,
-    MOVE_RIGHT_KEYVAL,
-    TAB_CLOSE_KEYVAL,
-    TAB_SEARCH_KEYVAL,
-    NAV_PREVIOUS_KEYVAL
-];
-
 function keydownHandler(e) {
     // When hold key pressed, block text entry and wait for hotkey.
     if (e.key == hold_key) {
         if (!holding) {
             LOG_INFO("Holding for hotkey...");
-            chrome.runtime.sendMessage({[HOLDKEY_MSG]: true});
+            chrome.runtime.sendMessage({[HOLD_KEY_MSG]: true});
             holding = true;
         }
         // Prevent default behavior of hold key.
@@ -59,15 +59,15 @@ function keyupHandler(e) {
         }
         e.stopPropagation();
         LOG_INFO("Released for hotkey.");
-        chrome.runtime.sendMessage({[HOLDKEY_MSG]: false});
+        chrome.runtime.sendMessage({[HOLD_KEY_MSG]: false});
         holding = false;
     }
 }
 
 // Listen for globally broadcasted hold key events and update own state.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.hasOwnProperty(HOLDKEY_MSG)) {
-        holding = request[HOLDKEY_MSG];
+    if (request.hasOwnProperty(HOLD_KEY_MSG)) {
+        holding = request[HOLD_KEY_MSG];
         var hold_event_type = holding ? "pressed" : "released";
         LOG_INFO("Received hold key " + hold_event_type);
     }
