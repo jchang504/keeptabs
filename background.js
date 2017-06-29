@@ -325,14 +325,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             var normalized = hotkey.toLowerCase();
             var overrideDeduplicate = hotkey != normalized;
 
-            LOG_INFO("received hotkey");
-
             if (normalized in hotkeys_map) {
                 var hotkey_info = hotkeys_map[normalized];
                 var domain = hotkey_info[DOMAIN_KEY];
 
-                if(domain){
-                    LOG_INFO("handling tab switch for domain: " + domain );
+                if (domain){
+                    LOG_INFO("Handle tab switch for domain: " + domain);
                     handleTabSwitch(hotkey_info, overrideDeduplicate);
                 }
             }
