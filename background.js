@@ -14,11 +14,19 @@ var window_to_active_tab_map = {};
 
 // Regex for host and path matching.
 // DO NOT use these variables directly. Rather, use the functions
-// domainMatch and hostPathMatch below. Those functions protect against
+// domainMatch and domainPathMatch below. Those functions protect against
 // null values.
-const HOST_PATH_REGEX =
+// Javascript Regex allows you to organize the regex matching into various
+// capture groups that you can access through indices of the returned value from
+// the exec function call.
+// Capture group 0: The full URL of the string
+// Capture group 1: The full URL of the string except the protocol (ex:
+// "https://") or the" www.".
+// Capture group 2: The domain, which includes everything after where the "www."
+// would be (if it's not there) and before the first "/" after the "www."
+const DOMAIN_PATH_REGEX =
     new RegExp("^(?:http:\/\/|https:\/\/)?(?:www\.)?(([a-z0-9]+(?:[\-\.]{1}[a-z0-9]+)*\.[a-z]+)(?::[0-9]{1,5})?(?:\/.*)?)$", "i");
-const HOST_PATH_INDEX = 1;
+const DOMAIN_PATH_INDEX = 1;
 const DOMAIN_INDEX = 2;
 
 
@@ -45,13 +53,13 @@ function createNewTab(url) {
 
 // Returns whether the host and path of the two given URL's are the same
 // If either of them are null, then return false.
-function hostPathMatch(url1, url2){
+function domainPathMatch(url1, url2){
     if(url1 && url2){
-        var result1 = HOST_PATH_REGEX.exec(url1);
-        var result2 = HOST_PATH_REGEX.exec(url2);
+        var result1 = DOMAIN_PATH_REGEX.exec(url1);
+        var result2 = DOMAIN_PATH_REGEX.exec(url2);
         if(result1 && result2){
-            var host_path1 = result1[HOST_PATH_INDEX];
-            var host_path2 = result2[HOST_PATH_INDEX];
+            var host_path1 = result1[DOMAIN_PATH_INDEX];
+            var host_path2 = result2[DOMAIN_PATH_INDEX];
             return host_path1 === host_path2;
         } else {
             return false;
@@ -65,8 +73,8 @@ function hostPathMatch(url1, url2){
 // If either of them are null, then return false.
 function domainMatch(url1, url2){
     if(url1 && url2){
-        var result1 = HOST_PATH_REGEX.exec(url1);
-        var result2 = HOST_PATH_REGEX.exec(url2);
+        var result1 = DOMAIN_PATH_REGEX.exec(url1);
+        var result2 = DOMAIN_PATH_REGEX.exec(url2);
         if(result1 && result2){
             var domain1 = result1[DOMAIN_INDEX];
             var domain2 = result2[DOMAIN_INDEX];
@@ -182,7 +190,7 @@ function navigateToPreviousTab() {
             var tab_id = tab_history[i];
             if (tab_id != current_tab_id) {
                 // Check if tab still exists.
-                for (tab of tabs) {
+                for (const tab of tabs) {
                     if (tab.id == tab_id) {
                         navigateToTab(tab_id, tab.windowId);
                         done = true;
