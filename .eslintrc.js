@@ -57,6 +57,7 @@ module.exports = {
         "TAB_CLOSE_KEYVAL":true,
         "TAB_CLOSE_SYMBOL":true,
         "TAB_ID_KEY": true,
+        "TAB_NEW_KEYVAL": true,
         "TAB_PREVIOUS_KEYVAL": true,
         "TAB_SEARCH_KEYVAL": true,
         "UPDATE_HOLD_KEY_MSG": true,
