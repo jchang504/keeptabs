@@ -32,7 +32,7 @@ module.exports = {
         "DEDUPLICATE_KEY": true,
         "DOMAIN_KEY": true,
         "FOCUSED": true,
-        "HOLDKEY_MSG":true,
+        "HOLD_KEY_MSG":true,
         "HOLD_KEY_DEFAULT": true,
         "HOLD_KEY_KEY": true,
         "HOTKEYS_DEFAULT":true,
