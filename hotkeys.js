@@ -1,13 +1,3 @@
-var BUILT_IN_HOTKEYS = [
-    NAV_LEFT_KEYVAL,
-    NAV_RIGHT_KEYVAL,
-    MOVE_LEFT_KEYVAL,
-    MOVE_RIGHT_KEYVAL,
-    TAB_CLOSE_KEYVAL,
-    TAB_SEARCH_KEYVAL,
-    NAV_PREVIOUS_KEYVAL
-];
-
 // Global state.
 // This gets updated by reading from storage before key event handlers are
 // attached. See bottom.
@@ -37,7 +27,7 @@ function keydownHandler(e) {
         if (e.key.length == 1 &&
             65 <= ascii_value && ascii_value <= 90 ||
             97 <= ascii_value && ascii_value <= 122) {
-                hotkey += e.key;
+            hotkey += e.key;
         }
         // Capture built-in hotkeys. Send them immediately so that the user can
         // repeatedly use them without releasing the hold key.

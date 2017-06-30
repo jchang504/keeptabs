@@ -284,6 +284,9 @@ function handleTabSwitch(hotkey_info, overrideDeduplicate){
     );
 }
 
+function openNewTab(){
+    chrome.tabs.create({});
+}
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Hold key event (pressed or released); broadcast to all tabs.
@@ -321,6 +324,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
         else if (hotkey == NAV_PREVIOUS_KEYVAL) {
             navigateToPreviousTab();
+        }
+        else if (hotkey == TAB_NEW_KEYVAL) {
+            openNewTab();
         }
         else {
             var normalized = hotkey.toLowerCase();

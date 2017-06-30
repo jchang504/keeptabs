@@ -22,7 +22,20 @@ var MOVE_LEFT_KEYVAL = "{";
 var MOVE_RIGHT_KEYVAL = "}";
 var TAB_CLOSE_KEYVAL = ";";
 var TAB_SEARCH_KEYVAL = "/";
+var TAB_NEW_KEYVAL = ".";
 var NAV_PREVIOUS_KEYVAL = " ";
+
+var BUILT_IN_HOTKEYS = [
+    NAV_LEFT_KEYVAL,
+    NAV_RIGHT_KEYVAL,
+    MOVE_LEFT_KEYVAL,
+    MOVE_RIGHT_KEYVAL,
+    TAB_CLOSE_KEYVAL,
+    TAB_SEARCH_KEYVAL,
+    NAV_PREVIOUS_KEYVAL,
+    TAB_NEW_KEYVAL
+];
+
 // For tab search page.
 var ENTER_KEYVAL = "Enter";
 var ARROW_UP_KEYVAL = "ArrowUp";
