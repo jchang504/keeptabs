@@ -12,8 +12,19 @@ var current_tab_index = 0;
 // changes (this does NOT fire the active tab change listener).
 var window_to_active_tab_map = {};
 
+// Regex for domain and path matching.
+// Javascript Regex allows you to organize the regex matching into various
+// capture groups that you can access through indices of the returned value from
+// the exec function call.
+// Capture group 0: The full URL of the string
+// Capture group 1: The full URL of the string except the protocol (ex:
+// "https://") and the" www.".
+// Capture group 2: The domain, which includes everything after where the "www."
+// would be (if it's not there) and before the first "/" after the "www."
+const DOMAIN_PATH_REGEX =
+    /^(?:http:\/\/|https:\/\/)?(?:www\.)?(([a-z0-9]+(?:[\-\.][a-z0-9]+)*\.[a-z]+)(?::[0-9]{1,5})?(?:\/.*)?)$/;
 //The indices of the captured components of calling exec on the returned values
-//from the regex of the createDomainPathRegex function
+//from DOMAIN_PATH_REGEX
 const DOMAIN_PATH_INDEX = 1;
 const DOMAIN_INDEX = 2;
 
@@ -37,33 +48,12 @@ function createNewTab(url) {
         }
     );
 }
-// Regex for domain and path matching.
-// IMPORTANT: It is important to create a new regex object each time you want to match
-// something because each regex object is stateful and using the same one over
-// and over again may cause behavior you did not intend.
-// Javascript Regex allows you to organize the regex matching into various
-// capture groups that you can access through indices of the returned value from
-// the exec function call.
-// Capture group 0: The full URL of the string
-// Capture group 1: The full URL of the string except the protocol (ex:
-// "https://") and the" www.".
-// Capture group 2: The domain, which includes everything after where the "www."
-// would be (if it's not there) and before the first "/" after the "www."
-function createDomainPathRegex(){
-    var DOMAIN_PATH_REGEX =
-        /^(?:http:\/\/|https:\/\/)?(?:www\.)?(([a-z0-9]+(?:[\-\.][a-z0-9]+)*\.[a-z]+)(?::[0-9]{1,5})?(?:\/.*)?)$/;
-    return DOMAIN_PATH_REGEX;
-}
-
-
 // Returns whether the host and path of the two given URL's are the same
 // If either of them are null, then return false.
 function domainPathMatch(url1, url2){
     if(url1 && url2){
-        var regex1 = createDomainPathRegex();
-        var result1 = regex1.exec(url1);
-        var regex2 = createDomainPathRegex();
-        var result2 = regex2.exec(url2);
+        var result1 = DOMAIN_PATH_REGEX.exec(url1);
+        var result2 = DOMAIN_PATH_REGEX.exec(url2);
         if(result1 && result2){
             var host_path1 = result1[DOMAIN_PATH_INDEX];
             var host_path2 = result2[DOMAIN_PATH_INDEX];
@@ -81,10 +71,8 @@ function domainPathMatch(url1, url2){
 function domainMatch(url1, url2){
     if(url1 && url2){
         LOG_INFO("Comparing urls: " + url1 + " and " + url2);
-        var regex1 = createDomainPathRegex();
-        var result1 = regex1.exec(url1);
-        var regex2 = createDomainPathRegex();
-        var result2 = regex2.exec(url2);
+        var result1 = DOMAIN_PATH_INDEX.exec(url1);
+        var result2 = DOMAIN_PATH_REGEX.exec(url2);
         if(result1 && result2){
             var domain1 = result1[DOMAIN_INDEX];
             var domain2 = result2[DOMAIN_INDEX];
