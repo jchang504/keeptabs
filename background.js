@@ -286,13 +286,13 @@ function handleTabSwitch(hotkey_info, overrideDeduplicate){
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Hold key event (pressed or released); broadcast to all tabs.
-    if (request.hasOwnProperty(HOLDKEY_MSG)) {
-        var pressed = request[HOLDKEY_MSG];
+    if (request.hasOwnProperty(HOLD_KEY_MSG)) {
+        var pressed = request[HOLD_KEY_MSG];
         var hold_event_type = pressed ? "pressed" : "released";
         LOG_INFO("Broadcasting hold key " + hold_event_type);
         chrome.tabs.query({}, function(tabs) {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {[HOLDKEY_MSG]: pressed});
+                chrome.tabs.sendMessage(tab.id, {[HOLD_KEY_MSG]: pressed});
             }
         });
     }
@@ -325,14 +325,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             var normalized = hotkey.toLowerCase();
             var overrideDeduplicate = hotkey != normalized;
 
-            LOG_INFO("received hotkey");
-
             if (normalized in hotkeys_map) {
                 var hotkey_info = hotkeys_map[normalized];
                 var domain = hotkey_info[DOMAIN_KEY];
 
-                if(domain){
-                    LOG_INFO("handling tab switch for domain: " + domain );
+                if (domain){
+                    LOG_INFO("Handle tab switch for domain: " + domain);
                     handleTabSwitch(hotkey_info, overrideDeduplicate);
                 }
             }
