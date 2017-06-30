@@ -71,7 +71,7 @@ function domainPathMatch(url1, url2){
 function domainMatch(url1, url2){
     if(url1 && url2){
         LOG_INFO("Comparing urls: " + url1 + " and " + url2);
-        var result1 = DOMAIN_PATH_INDEX.exec(url1);
+        var result1 = DOMAIN_PATH_REGEX.exec(url1);
         var result2 = DOMAIN_PATH_REGEX.exec(url2);
         if(result1 && result2){
             var domain1 = result1[DOMAIN_INDEX];
