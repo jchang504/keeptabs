@@ -1,29 +1,31 @@
 // CSS selectors.
-var HOLD_KEY_SELECTOR ='#hold_key';
-var HOTKEY_ENTRYS_TABLE_SELECTOR ='#hotkey_entry > tbody';
-var HOTKEY_ENTRY_ROWS_SELECTOR ='#hotkey_entry tr:not(:first-child)';
-var HOTKEY_ENTRY_LAST_ROW_SELECTOR ='#hotkey_entry tr:last-child';
-var HOTKEY_ENTRY_DELETE_SELECTOR ='button.delete';
-var INPUTTABLE_ELEMENT_SELECTOR ='input,select';
-var INPUT_TEXT_SELECTOR ='input[type="text"]';
-var INPUT_TARGET_SELECTOR ='input[name="target"]';
-var INPUT_HOTKEY_SELECTOR ='input[name="hotkey"]';
-var INPUT_DEDUPLICATE_SELECTOR ='input[name="deduplicate"]';
-var INPUT_MATCH_PREFIX_SELECTOR ='input[name="match_prefix"]';
-var OPTIONS_FORM_SELECTOR ='#options';
-var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR ='#add_hotkey';
-var SAVE_BUTTON_SELECTOR ='#save';
-var CHECKED ='checked';
-var DISABLED ='disabled';
+var HOLD_KEY_SELECTOR = '#hold_key';
+var HOTKEY_ENTRYS_TABLE_SELECTOR = '#hotkey_entry > tbody';
+var HOTKEY_ENTRY_ROWS_SELECTOR = '#hotkey_entry tr:not(:first-child)';
+var HOTKEY_ENTRY_LAST_ROW_SELECTOR = '#hotkey_entry tr:last-child';
+var HOTKEY_ENTRY_DELETE_SELECTOR = 'button.delete';
+var INPUTTABLE_ELEMENT_SELECTOR = 'input,select';
+var INPUT_TEXT_SELECTOR = 'input[type="text"]';
+var INPUT_HOTKEY_SELECTOR = 'input[name="hotkey"]';
+var INPUT_TARGET_SELECTOR = 'input[name="target"]';
+var INPUT_DEDUPLICATE_SELECTOR = 'input[name="deduplicate"]';
+var INPUT_MATCH_PREFIX_SELECTOR = 'input[name="match_prefix"]';
+var OPTIONS_FORM_SELECTOR = '#options';
+var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
+var SAVE_BUTTON_SELECTOR = '#save';
+var CHECKED = 'checked';
+var DISABLED = 'disabled';
 
-// TODO: Make match_prefix input required when we start actually using this
-// field.
+// The pattern for match_prefix is a basic check that the prefix can be made a
+// valid URL match pattern by adding "*" on the end. See
+// https://developer.chrome.com/extensions/match_patterns.
 var HOTKEY_ENTRY_HTML = ' \
     <tr> \
         <td><input required type="text" maxlength="5" name="hotkey"></td> \
         <td><input required type="text" name="target"></td> \
         <td><input type="checkbox" name="deduplicate"></td> \
-        <td><input type="text" name="match_prefix"></td> \
+        <td><input required type="text" name="match_prefix" \
+                pattern=".+://.+/.*"></td> \
         <td><button class="delete">Delete</button></td> \
     </tr> \
 ';
@@ -80,11 +82,6 @@ function restoreHotkeyEntrys(hotkeys) {
     for (var i = 0; i < hotkeys.length; i++) {
         addHotkeyEntry();
         var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
-// TODO: Remove after options transition.
-        if (hotkeys[i].hasOwnProperty(DOMAIN_KEY)) {
-            hotkeys[i][TARGET_KEY] = hotkeys[i][DOMAIN_KEY];
-        }
-// TODO: End Remove section.
         jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(
                 hotkeys[i][HOTKEY_KEY]);
         jqHotkeyEntryRow.find(INPUT_TARGET_SELECTOR).val(

@@ -12,23 +12,6 @@ var current_tab_index = 0;
 // changes (this does NOT fire the active tab change listener).
 var window_to_active_tab_map = {};
 
-// Regex for domain and path matching.
-// Javascript Regex allows you to organize the regex matching into various
-// capture groups that you can access through indices of the returned value from
-// the exec function call.
-// Capture group 0: The full URL of the string
-// Capture group 1: The full URL of the string except the protocol (ex:
-// "https://") and the" www.".
-// Capture group 2: The domain, which includes everything after where the "www."
-// would be (if it's not there) and before the first "/" after the "www."
-const DOMAIN_PATH_REGEX =
-    /^(?:http:\/\/|https:\/\/)?(?:www\.)?(([a-z0-9]+(?:[\-\.][a-z0-9]+)*\.[a-z]+)(?::[0-9]{1,5})?(?:\/.*)?)$/;
-//The indices of the captured components of calling exec on the returned values
-//from DOMAIN_PATH_REGEX
-const DOMAIN_PATH_INDEX = 1;
-const DOMAIN_INDEX = 2;
-
-
 // Navigate to (make active) the specified tab (and focus its window, if the
 // optional argument is provided).
 function navigateToTab(tab_id, window_id) {
@@ -42,71 +25,11 @@ function navigateToTab(tab_id, window_id) {
 // Create a new tab of the url (and navigate to it). Also used for tab search.
 function createNewTab(url) {
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-        function(tabs) {
+        function (tabs) {
             LOG_INFO("Create new tab of: " + url);
             chrome.tabs.create({[URL]: url});
         }
     );
-}
-// Returns whether the host and path of the two given URL's are the same
-// If either of them are null, then return false.
-function domainPathMatch(url1, url2){
-    if(url1 && url2){
-        var result1 = DOMAIN_PATH_REGEX.exec(url1);
-        var result2 = DOMAIN_PATH_REGEX.exec(url2);
-        if(result1 && result2){
-            var host_path1 = result1[DOMAIN_PATH_INDEX];
-            var host_path2 = result2[DOMAIN_PATH_INDEX];
-            return host_path1 === host_path2;
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
-}
-
-// Returns whether the domains of the two given URL's are the same.
-// If either of them are null, then return false.
-function domainMatch(url1, url2){
-    if(url1 && url2){
-        LOG_INFO("Comparing urls: " + url1 + " and " + url2);
-        var result1 = DOMAIN_PATH_REGEX.exec(url1);
-        var result2 = DOMAIN_PATH_REGEX.exec(url2);
-        if(result1 && result2){
-            var domain1 = result1[DOMAIN_INDEX];
-            var domain2 = result2[DOMAIN_INDEX];
-            LOG_INFO("with domains: " + domain1 + " and " + domain2);
-            return domain1 === domain2;
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
-}
-
-/*
- * url: the string that includes the protocol and domain name of the site you
- * want to go to (e.g. "https://www.google.com").
- * deduplicate: true if you want to check for a duplicate and go to it if it
- * exists instead of creating a new tab; false if you want to create a new tab
- * regardless of pre-existing tabs.
- */
-function openTab(url, deduplicate){
-    chrome.tabs.query({}, function(tabs){
-        if (deduplicate) {
-            for (const tab of tabs){
-                var tab_url = tab.url;
-                if (domainMatch(url, tab_url)) {
-                    LOG_INFO("Switch active tab to: " + tab_url);
-                    navigateToTab(tab.id, tab.windowId);
-                    return;
-                }
-            }
-        }
-        createNewTab(url);
-    });
 }
 
 /* direction: -1 for left, 1 for right
@@ -162,10 +85,11 @@ function loadHotkeys() {
     LOG_INFO("Load hotkeys");
     hotkeys_map = {};
     chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items) {
-        for (const hotkey_info of items[HOTKEYS_KEY]){
+        for (const hotkey_info of items[HOTKEYS_KEY]) {
             hotkeys_map[hotkey_info[HOTKEY_KEY]] = {
                 [TARGET_KEY]: hotkey_info[TARGET_KEY],
-                [DEDUPLICATE_KEY]: hotkey_info[DEDUPLICATE_KEY]
+                [DEDUPLICATE_KEY]: hotkey_info[DEDUPLICATE_KEY],
+                [MATCH_PREFIX_KEY]: hotkey_info[MATCH_PREFIX_KEY]
             };
         }
     });
@@ -177,8 +101,8 @@ function openTabSearch() {
     createNewTab(SEARCH_URL);
 }
 
-// Navigate to the previous tab that was navigated to with KeepTabs. Useful for
-// quick alt+tab style switching between two tabs.
+// Navigate to the most recently active still-existing tab before the current
+// tab. Useful for quick alt+tab style switching between two tabs.
 function navigateToPreviousTab() {
     LOG_INFO("Navigate to previous tab");
     var current_tab_id = tab_history[current_tab_index];
@@ -233,59 +157,61 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
     window_to_active_tab_map[activeInfo.windowId] = activeInfo.tabId;
 });
 
-function cycleTabs(domain, active_tab_id){
-    LOG_INFO("Cycling tabs with domain: " + domain + "from tab id: " +
-        active_tab_id);
-    chrome.tabs.query({},
-        function(tabs) {
-            var tab_index = 0;
-            while(tabs[tab_index].id != active_tab_id){
-                tab_index++;
-            }
-            LOG_INFO("Current tab index: " + tab_index);
-            LOG_INFO("Number of tabs: " + tabs.length);
-            
-            let increment = 0;
-            let curr_tab;
-            let curr_index;
-            //I included a check on the increment counter just to make sure we
-            //don't end up in an infinite loop if something happens to the
-            //active tab (like it's closed or redirected) right before this
-            //function is called.
-            do {
-                increment++;
-                curr_index = (tab_index + increment) % tabs.length;
-                curr_tab = tabs[curr_index];
-            } while((! domainMatch(curr_tab.url, domain)) &&
-                increment < tabs.length);
-            LOG_INFO("New index: " + curr_index);
-
-            navigateToTab(curr_tab.id, curr_tab.windowId);
-        }
-    );
-
-}
-
-function handleTabSwitch(hotkey_info, overrideDeduplicate){
-    var domain = hotkey_info[TARGET_KEY];
-    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-        function(tabs) {
-            var active_tab = tabs[0];
-            var url = active_tab.url;
-            var needToCycle = domainMatch(domain, url);
-            if(needToCycle && !overrideDeduplicate){
-                cycleTabs(domain, active_tab.id);
-
-            } else {
-                openTab(domain, hotkey_info[DEDUPLICATE_KEY] &&
-                    !overrideDeduplicate);
-            }
-        }
-    );
-}
-
-function openNewTab(){
+function openNewTab() {
     chrome.tabs.create({});
+}
+
+// Handles any custom hotkey received (including invalid ones).
+function handleCustomHotkey(hotkey) {
+    var normalized = hotkey.toLowerCase();
+    // If hotkey is valid...
+    if (hotkeys_map.hasOwnProperty(normalized)) {
+        LOG_INFO("Activate custom hotkey: " + normalized);
+        var hotkey_info = hotkeys_map[normalized];
+        var target = hotkey_info[TARGET_KEY];
+        // Only deduplicate if checked in options and not overridden by capital
+        // letter in hotkey.
+        var deduplicate = hotkey_info[DEDUPLICATE_KEY] && hotkey == normalized;
+        if (!deduplicate) {
+            LOG_INFO("Not deduplicating; create new tab of target: " + target);
+            createNewTab(target);
+        }
+        else {
+            var match_prefix = hotkey_info[MATCH_PREFIX_KEY];
+            switchToMatchIfExists(target, match_prefix);
+        }
+    }
+}
+
+// Queries for tabs with URLs starting with the match_prefix and navigates to
+// the first one, unless the current tab is already a match -- then it cycles
+// to the next matching tab after the current one. If no matches exist, opens a
+// new tab of target.
+function switchToMatchIfExists(target, match_prefix) {
+    LOG_INFO("Query for tabs matching prefix: " + match_prefix);
+    chrome.tabs.query({[URL]: match_prefix + "*"}, function(matching_tabs) {
+        if (matching_tabs.length > 0) {
+            var current_tab_matches = false;
+            for (var i = 0; i < matching_tabs.length; i++) {
+                if (matching_tabs[i].id == tab_history[current_tab_index]) {
+                    LOG_INFO("Current tab matches; cycle to next");
+                    current_tab_matches = true;
+                    var next_tab =
+                        matching_tabs[(i + 1) % matching_tabs.length];
+                    navigateToTab(next_tab.id, next_tab.windowId);
+                    break;
+                }
+            }
+            if (!current_tab_matches) {
+                LOG_INFO("Navigate to first match");
+                navigateToTab(matching_tabs[0].id, matching_tabs[0].windowId);
+            }
+        }
+        else {
+            LOG_INFO("No matches; create new tab of target: " + target);
+            createNewTab(target);
+        }
+    });
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -329,18 +255,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             openNewTab();
         }
         else {
-            var normalized = hotkey.toLowerCase();
-            var overrideDeduplicate = hotkey != normalized;
-
-            if (normalized in hotkeys_map) {
-                var hotkey_info = hotkeys_map[normalized];
-                var domain = hotkey_info[TARGET_KEY];
-
-                if (domain){
-                    LOG_INFO("Handle tab switch for domain: " + domain);
-                    handleTabSwitch(hotkey_info, overrideDeduplicate);
-                }
-            }
+            handleCustomHotkey(hotkey);
         }
     }
     // Refresh options after edit.

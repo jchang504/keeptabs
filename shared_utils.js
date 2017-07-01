@@ -51,7 +51,6 @@ var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
 var HOTKEY_KEY = "hotkey";
 var TARGET_KEY = "target";
-var DOMAIN_KEY = "domain"; // TODO: Remove after transition to new options.
 var DEDUPLICATE_KEY = "deduplicate";
 var MATCH_PREFIX_KEY = "match_prefix";
 
