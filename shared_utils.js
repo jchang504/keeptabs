@@ -49,9 +49,11 @@ var HOLD_KEY_KEY = "hold_key";
 var HOLD_KEY_DEFAULT = "Escape";
 var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
-var DOMAIN_KEY = "domain";
 var HOTKEY_KEY = "hotkey";
+var TARGET_KEY = "target";
+var DOMAIN_KEY = "domain"; // TODO: Remove after transition to new options.
 var DEDUPLICATE_KEY = "deduplicate";
+var MATCH_PREFIX_KEY = "match_prefix";
 
 /* JavaScript event names */
 var INPUT = "input";

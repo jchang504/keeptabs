@@ -164,7 +164,7 @@ function loadHotkeys() {
     chrome.storage.sync.get({[HOTKEYS_KEY]: HOTKEYS_DEFAULT}, function(items) {
         for (const hotkey_info of items[HOTKEYS_KEY]){
             hotkeys_map[hotkey_info[HOTKEY_KEY]] = {
-                [DOMAIN_KEY]: hotkey_info[DOMAIN_KEY],
+                [TARGET_KEY]: hotkey_info[TARGET_KEY],
                 [DEDUPLICATE_KEY]: hotkey_info[DEDUPLICATE_KEY]
             };
         }
@@ -267,7 +267,7 @@ function cycleTabs(domain, active_tab_id){
 }
 
 function handleTabSwitch(hotkey_info, overrideDeduplicate){
-    var domain = hotkey_info[DOMAIN_KEY];
+    var domain = hotkey_info[TARGET_KEY];
     chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
         function(tabs) {
             var active_tab = tabs[0];
@@ -334,7 +334,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
             if (normalized in hotkeys_map) {
                 var hotkey_info = hotkeys_map[normalized];
-                var domain = hotkey_info[DOMAIN_KEY];
+                var domain = hotkey_info[TARGET_KEY];
 
                 if (domain){
                     LOG_INFO("Handle tab switch for domain: " + domain);

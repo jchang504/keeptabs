@@ -25,22 +25,23 @@
         </select>
         <h2>Customize hotkeys</h2>
         <p>
-            The <strong>domain</strong> saved here will have a shortcut to
-            switch to or create the corresponding tab (e.g. facebook.com,
-            google.com). The <strong>HotKey</strong> entry is linked to which
-            hotkeys pressed will navigate you to the corresponding domain (e.g.
-            "<HOLD>f" to open facebook).  Checking the
-            <strong>Deduplicate</strong> option will bring you back to an
-            existing window if you have one already opened.
+            Hit a <strong>Hotkey</strong> with your hold key to navigate to its
+            <strong>Target</strong>. If <strong>Deduplicate</strong> is
+            checked, KeepTabs will first check if the URL of any existing tabs
+            starts with the <strong>Match Prefix</strong>, and if so, navigate
+            to the first such existing tab (use the hotkey repeatedly to cycle
+            through all matches). If not, or if there are no existing matching
+            tabs, KeepTabs will open a new tab of the <strong>Target</strong>.
         </p>
         <table id="hotkey_entry"><tbody>
             <tr>
-                <th>Domain</th>
-                <th>HotKey</th>
+                <th>Hotkey</th>
+                <th>Target</th>
                 <th>Deduplicate</th>
+                <th>Match Prefix</th>
             </tr>
         </tbody></table>
-        <button id="add_hotkey">Add HotKeys</button>
+        <button id="add_hotkey">Add Hotkey</button>
         <input id="save" type="submit" value="Save all">
     </form>
 
