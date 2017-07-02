@@ -7,3 +7,11 @@ body {
 #hold_key_description {
     margin-bottom: 10px;
 }
+
+input[name="target"], input[name="match_prefix"] {
+    width: 300px;
+}
+
+input[name="hotkey"] {
+    width: 50px;
+}
