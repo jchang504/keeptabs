@@ -1,9 +1,27 @@
+var BODY_SELECTOR = "body";
+var OVERLAY_HTML = '<div id="overlay"><img></div>';
+var OVERLAY_SELECTOR = "#overlay";
+var OVERLAY_HOLDING_CLASS = "holding";  // Coupled with CSS in overlay.css!
+var OVERLAY_IMG_SELECTOR = "#overlay > img";
+var SRC = "src";
+
 // Global state.
 // This gets updated by reading from storage before key event handlers are
 // attached. See bottom.
 var hold_key = null;
 var holding = false;
 var hotkey = "";
+
+function setHoldKeyStatus(is_holding) {
+    console.log("Setting " + is_holding);
+    holding = is_holding;
+    if (is_holding) {
+        $(OVERLAY_SELECTOR).addClass(OVERLAY_HOLDING_CLASS);
+    }
+    else {
+        $(OVERLAY_SELECTOR).removeClass(OVERLAY_HOLDING_CLASS);
+    }
+}
 
 function sendHotkeyMessage(hotkey) {
     LOG_INFO("Send hotkey: " + hotkey);
@@ -16,7 +34,7 @@ function keydownHandler(e) {
         if (!holding) {
             LOG_INFO("Holding for hotkey...");
             chrome.runtime.sendMessage({[HOLD_KEY_MSG]: true});
-            holding = true;
+            setHoldKeyStatus(true);
         }
         // Prevent default behavior of hold key.
         e.preventDefault();
@@ -50,14 +68,14 @@ function keyupHandler(e) {
         e.stopPropagation();
         LOG_INFO("Released for hotkey.");
         chrome.runtime.sendMessage({[HOLD_KEY_MSG]: false});
-        holding = false;
+        setHoldKeyStatus(false);
     }
 }
 
 // Listen for globally broadcasted hold key events and update own state.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.hasOwnProperty(HOLD_KEY_MSG)) {
-        holding = request[HOLD_KEY_MSG];
+        setHoldKeyStatus(request[HOLD_KEY_MSG]);
         var hold_event_type = holding ? "pressed" : "released";
         LOG_INFO("Received hold key " + hold_event_type);
     }
@@ -71,4 +89,10 @@ chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_DEFAULT}, function(items) {
     // Only add listeners once hold_key has been updated from options.
     $(window).get(0).addEventListener(KEYDOWN, keydownHandler, true);
     $(window).get(0).addEventListener(KEYUP, keyupHandler, true);
+});
+
+$(document).ready(function() {
+    // Add visual overlay UI.
+    $(BODY_SELECTOR).append(OVERLAY_HTML);
+    $(OVERLAY_IMG_SELECTOR).prop(SRC, chrome.extension.getURL(ICON_48_URL));
 });
