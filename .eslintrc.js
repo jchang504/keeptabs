@@ -27,6 +27,7 @@ module.exports = {
 
     "globals": {
         "ACTIVE": true,
+        "BUILT_IN_HOTKEYS": true,
         "CURRENT_TAB_KEY": true,
         "CURRENT_WINDOW": true,
         "DEDUPLICATE_KEY": true,
