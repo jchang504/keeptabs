@@ -45,6 +45,7 @@ module.exports = {
         "KEYDOWN": true,
         "KEYUP": true,
         "LOG_INFO": true,
+        "MATCH_PREFIX_KEY": true,
         "MOVE_LEFT_KEYVAL":true,
         "MOVE_RIGHT_KEYVAL": true,
         "NAV_LEFT_KEYVAL":true,
@@ -61,6 +62,7 @@ module.exports = {
         "TAB_NEW_KEYVAL": true,
         "TAB_PREVIOUS_KEYVAL": true,
         "TAB_SEARCH_KEYVAL": true,
+        "TARGET_KEY": true,
         "UPDATE_HOLD_KEY_MSG": true,
         "WINDOW_ID_KEY": true,
         "chrome": true
