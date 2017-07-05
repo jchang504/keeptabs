@@ -19,8 +19,12 @@
     "content_scripts": [{
         "matches": ["<all_urls>"],
         "js": ["jquery-3.2.1.min.js", "shared_utils.js", "hotkeys.js"],
+        "css": ["overlay.css"],
         "run_at": "document_start"
     }],
+    "web_accessible_resources": [
+        "icons/icon48.png"
+    ],
     "options_ui": {
         "page": "options.html",
         "chrome_style": true

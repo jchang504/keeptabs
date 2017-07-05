@@ -1,0 +1,23 @@
+#overlay {
+    /*
+     * Centering stuff from
+     * https://css-tricks.com/considerations-styling-modal/.
+     */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    /*
+     * Other styling.
+     * TODO: Needs font and such to normalize (otherwise there are differences
+     * across sites, which looks funny).
+     */
+    display: none;
+    background-color: rgba(50, 50, 50, 0.7);
+    padding: 10px;
+}
+
+#overlay.holding {
+    display: block;
+}

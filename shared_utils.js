@@ -43,6 +43,7 @@ var ARROW_DOWN_KEYVAL = "ArrowDown";
 
 /* Extension page URLs */
 var SEARCH_URL = "tab_search.html";
+var ICON_48_URL = "icons/icon48.png";
 
 /* Chrome storage keys and default values */
 var HOLD_KEY_KEY = "hold_key";
