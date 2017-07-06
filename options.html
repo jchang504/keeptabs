@@ -33,11 +33,13 @@
             through all matches). If not, or if there are no existing matching
             tabs, KeepTabs will open a new tab of the <strong>Target</strong>.
         </p>
-        <p><strong>Syntax note</strong>: If you want to match to just a bare
-        host with no specific path (e.g. "https://facebook.com"), your
-        <strong>Match Prefix</strong> <em>must</em> still have a "/" after the
-        host (e.g. "https://facebook.com<strong>/</strong>"). You will not be
-        able to save if any of your match prefixes doesn't fit this
+        <p><strong>Syntax notes</strong>: If you omit the scheme (e.g.
+        "http://", "https://",) it will match either of http or https. If you
+        want to match "file://" or "chrome://" schemes, you must specify them.
+        If you want to match to just a bare host with no specific path (e.g.
+        "facebook.com"), your <strong>Match Prefix</strong> <em>must</em> still
+        have a "/" after the host (e.g.  "facebook.com<strong>/</strong>"). You
+        will not be able to save if any of your match prefixes doesn't fit this
         requirement.</p>
         <table id="hotkey_entry"><tbody>
             <tr>

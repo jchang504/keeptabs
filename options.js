@@ -25,7 +25,7 @@ var HOTKEY_ENTRY_HTML = ' \
         <td><input required type="text" name="target"></td> \
         <td><input type="checkbox" name="deduplicate"></td> \
         <td><input required type="text" name="match_prefix" \
-                pattern=".+://.+/.*"></td> \
+                pattern=".+/.*"></td> \
         <td><button class="delete">Delete</button></td> \
     </tr> \
 ';

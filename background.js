@@ -179,6 +179,10 @@ function handleCustomHotkey(hotkey) {
         }
         else {
             var match_prefix = hotkey_info[MATCH_PREFIX_KEY];
+            if (match_prefix.indexOf("://") == -1) {
+                // No scheme specified, use "*" (matches either http or https).
+                match_prefix = "*://" + match_prefix;
+            }
             switchToMatchIfExists(target, match_prefix);
         }
     }
