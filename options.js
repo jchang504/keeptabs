@@ -16,16 +16,12 @@ var SAVE_BUTTON_SELECTOR = '#save';
 var CHECKED = 'checked';
 var DISABLED = 'disabled';
 
-// The pattern for match_prefix is a basic check that the prefix can be made a
-// valid URL match pattern by adding "*" on the end. See
-// https://developer.chrome.com/extensions/match_patterns.
 var HOTKEY_ENTRY_HTML = ' \
     <tr> \
         <td><input required type="text" maxlength="5" name="hotkey"></td> \
         <td><input required type="text" name="target"></td> \
         <td><input type="checkbox" name="deduplicate"></td> \
-        <td><input required type="text" name="match_prefix" \
-                pattern=".+/.*"></td> \
+        <td><input required type="text" name="match_prefix"></td> \
         <td><button class="delete">Delete</button></td> \
     </tr> \
 ';
@@ -52,10 +48,11 @@ function getHotkeyEntrys() {
     $(HOTKEY_ENTRY_ROWS_SELECTOR).each(function() {
         var jqThis = $(this);
         var hotkey = jqThis.find(INPUT_HOTKEY_SELECTOR).val();
-        var target = jqThis.find(INPUT_TARGET_SELECTOR).val();
+        var target = prepareTarget(jqThis.find(INPUT_TARGET_SELECTOR).val());
         var deduplicate = jqThis.find(INPUT_DEDUPLICATE_SELECTOR).is(":" +
                 CHECKED);
-        var match_prefix = jqThis.find(INPUT_MATCH_PREFIX_SELECTOR).val();
+        var match_prefix = prepareMatchPrefix(
+                jqThis.find(INPUT_MATCH_PREFIX_SELECTOR).val());
         hotkeys.push({
             [HOTKEY_KEY]: hotkey,
             [TARGET_KEY]: target,
@@ -64,6 +61,35 @@ function getHotkeyEntrys() {
         });
     });
     return hotkeys;
+}
+
+// Prepend http:// if no scheme is specified.
+function prepareTarget(target) {
+    var scheme_delimiter_index = target.indexOf("://");
+    if (scheme_delimiter_index == -1) {
+        target = "http://" + target;
+    }
+    return target;
+}
+
+// Cleans up the user_prefix so it can be made a valid URL match pattern by
+// adding just a *. See https://developer.chrome.com/extensions/match_patterns.
+function prepareMatchPrefix(user_prefix) {
+    var scheme_delimiter_index = user_prefix.indexOf("://");
+    var end_of_domain_index;
+    if (scheme_delimiter_index == -1) {
+        end_of_domain_index = user_prefix.indexOf("/");
+        // No scheme specified, use "*" (matches either http or https).
+        user_prefix = "*://" + user_prefix;
+    }
+    else {
+        end_of_domain_index = user_prefix.indexOf("/",
+                scheme_delimiter_index + 3);
+    }
+    if (end_of_domain_index == -1) {
+        user_prefix += "/";
+    }
+    return user_prefix;
 }
 
 function restoreHotkeyEntrys(hotkeys) {
