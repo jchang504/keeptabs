@@ -1,8 +1,11 @@
 var BODY_SELECTOR = "body";
-var OVERLAY_HTML = '<div id="overlay"><img></div>';
+// NOTE: This section is tightly coupled with the CSS in overlay.css.
+var OVERLAY_HTML = '<div id="overlay"><img><span></span></div>';
 var OVERLAY_SELECTOR = "#overlay";
-var OVERLAY_HOLDING_CLASS = "holding";  // Coupled with CSS in overlay.css!
+var OVERLAY_HOLDING_CLASS = "holding";
 var OVERLAY_IMG_SELECTOR = "#overlay > img";
+var OVERLAY_SPAN_SELECTOR = "#overlay > span";
+// End tightly coupled section with overlay.css.
 var SRC = "src";
 
 // Global state.
@@ -21,6 +24,11 @@ function setHoldKeyStatus(is_holding) {
     else {
         $(OVERLAY_SELECTOR).removeClass(OVERLAY_HOLDING_CLASS);
     }
+}
+
+function setHotkeyString(current_hotkey) {
+    hotkey = current_hotkey;
+    $(OVERLAY_SPAN_SELECTOR).text(hotkey);
 }
 
 function sendHotkeyMessage(hotkey) {
@@ -45,13 +53,13 @@ function keydownHandler(e) {
         if (e.key.length == 1 &&
             65 <= ascii_value && ascii_value <= 90 ||
             97 <= ascii_value && ascii_value <= 122) {
-            hotkey += e.key;
+            setHotkeyString(hotkey + e.key);
         }
         // Capture built-in hotkeys. Send them immediately so that the user can
         // repeatedly use them without releasing the hold key.
         else if (BUILT_IN_HOTKEYS.includes(e.key)) {
             sendHotkeyMessage(e.key);
-            hotkey = "";
+            setHotkeyString("");
         }
         e.stopPropagation();
         e.preventDefault();
@@ -63,7 +71,7 @@ function keyupHandler(e) {
     if (e.key == hold_key) {
         if (hotkey.length > 0) {
             sendHotkeyMessage(hotkey);
-            hotkey = "";
+            setHotkeyString("");
         }
         e.stopPropagation();
         LOG_INFO("Released for hotkey.");

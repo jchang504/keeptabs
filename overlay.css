@@ -18,6 +18,11 @@
     padding: 10px;
 }
 
+#overlay > span {
+    margin-left: 10px;
+    color: white;
+}
+
 #overlay.holding {
     display: block;
 }
