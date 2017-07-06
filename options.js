@@ -46,13 +46,18 @@ function addHotkeyEntry() {
 function getHotkeyEntrys() {
     var hotkeys = [];
     $(HOTKEY_ENTRY_ROWS_SELECTOR).each(function() {
-        var jqThis = $(this);
-        var hotkey = jqThis.find(INPUT_HOTKEY_SELECTOR).val();
-        var target = prepareTarget(jqThis.find(INPUT_TARGET_SELECTOR).val());
-        var deduplicate = jqThis.find(INPUT_DEDUPLICATE_SELECTOR).is(":" +
+        var jq_this = $(this);
+        var hotkey = jq_this.find(INPUT_HOTKEY_SELECTOR).val();
+        // Prepare target and display changes for transparency.
+        var jq_input_target = jq_this.find(INPUT_TARGET_SELECTOR);
+        var target = prepareTarget(jq_input_target.val());
+        jq_input_target.val(target);
+        var deduplicate = jq_this.find(INPUT_DEDUPLICATE_SELECTOR).is(":" +
                 CHECKED);
-        var match_prefix = prepareMatchPrefix(
-                jqThis.find(INPUT_MATCH_PREFIX_SELECTOR).val());
+        // Prepare match prefix and display changes for transparency.
+        jq_input_match_prefix = jq_this.find(INPUT_MATCH_PREFIX_SELECTOR);
+        var match_prefix = prepareMatchPrefix(jq_input_match_prefix.val());
+        jq_input_match_prefix.val(match_prefix);
         hotkeys.push({
             [HOTKEY_KEY]: hotkey,
             [TARGET_KEY]: target,
