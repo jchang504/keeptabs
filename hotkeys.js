@@ -16,7 +16,6 @@ var holding = false;
 var hotkey = "";
 
 function setHoldKeyStatus(is_holding) {
-    console.log("Setting " + is_holding);
     holding = is_holding;
     if (is_holding) {
         $(OVERLAY_SELECTOR).addClass(OVERLAY_HOLDING_CLASS);
