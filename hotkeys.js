@@ -37,6 +37,7 @@ function sendHotkeyMessage(hotkey) {
 }
 
 function keydownHandler(e) {
+    console.log("Keydown: " + String.fromCharCode(e.which));
     // When hold key pressed, block text entry and wait for hotkey.
     if (e.key == hold_key) {
         if (!holding) {
@@ -67,6 +68,7 @@ function keydownHandler(e) {
 }
 
 function keyupHandler(e) {
+    console.log("Keyup: " + String.fromCharCode(e.which));
     // When hold key released, unblock text entry and send any hotkey entered.
     if (e.key == hold_key) {
         if (hotkey.length > 0) {
