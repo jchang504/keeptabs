@@ -36,6 +36,30 @@ function sendHotkeyMessage(hotkey) {
     chrome.runtime.sendMessage({[HOTKEY_MSG]: hotkey});
 }
 
+function sendBuiltInHotkeyMessage(hotkey) {
+    LOG_INFO("Send built in hotkey: " + hotkey);
+    chrome.runtime.sendMessage({[BUILT_IN_HOTKEY_MSG]: hotkey});
+}
+
+function isLetter(keydownEvent){
+    const code = keydownEvent.code;
+    return code.startsWith(ALPHA_PREFIX);
+}
+
+//Assumes that the input KeyboardEvent is one English letter
+function extractKey(keydownEvent){
+    const code = keydownEvent.code;
+    var key = code.charAt(code.length - 1);
+    if(keydownEvent.shiftKey){
+        key = key.toUpperCase();
+    }
+    else {
+        key = key.toLowerCase();
+    }
+    return key;
+}
+
+
 function keydownHandler(e) {
     // When hold key pressed, block text entry and wait for hotkey.
     if (e.key == hold_key) {
@@ -44,23 +68,28 @@ function keydownHandler(e) {
             chrome.runtime.sendMessage({[HOLD_KEY_MSG]: true});
             setHoldKeyStatus(true);
         }
+        e.stopImmediatePropagation();
         // Prevent default behavior of hold key.
         e.preventDefault();
     }
-    if (holding) {
-        // Capture [A-Za-z].
-        var ascii_value = e.key.charCodeAt(0);
-        if (e.key.length == 1 &&
-            65 <= ascii_value && ascii_value <= 90 ||
-            97 <= ascii_value && ascii_value <= 122) {
-            setHotkeyString(hotkey + e.key);
+    else if (e[KEY_TO_PROP[hold_key]] && BUILT_IN_HOTKEYS.includes(e.code)){
+        sendBuiltInHotkeyMessage(e.code);
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    }
+    else if (holding) {
+        console.log(e.code);
+        if(isLetter(e)){
+            const key = extractKey(e);
+            setHotkeyString(hotkey + key);
         }
-        // Capture built-in hotkeys. Send them immediately so that the user can
-        // repeatedly use them without releasing the hold key.
-        else if (BUILT_IN_HOTKEYS.includes(e.key)) {
-            sendHotkeyMessage(e.key);
-            setHotkeyString("");
-        }
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    }
+}
+
+function keypressHandler(e) {
+    if(holding){
         e.stopPropagation();
         e.preventDefault();
     }
@@ -73,7 +102,7 @@ function keyupHandler(e) {
             sendHotkeyMessage(hotkey);
             setHotkeyString("");
         }
-        e.stopPropagation();
+        e.stopImmediatePropagation();
         LOG_INFO("Released for hotkey.");
         chrome.runtime.sendMessage({[HOLD_KEY_MSG]: false});
         setHoldKeyStatus(false);
@@ -97,6 +126,7 @@ chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_DEFAULT}, function(items) {
     // Only add listeners once hold_key has been updated from options.
     $(window).get(0).addEventListener(KEYDOWN, keydownHandler, true);
     $(window).get(0).addEventListener(KEYUP, keyupHandler, true);
+    $(window).get(0).addEventListener(KEYPRESS, keypressHandler, true);
 });
 
 $(document).ready(function() {

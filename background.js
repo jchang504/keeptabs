@@ -228,36 +228,38 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         });
     }
     // Hotkey sent.
-    else if (request.hasOwnProperty(HOTKEY_MSG)) {
-        var hotkey = request[HOTKEY_MSG];
-        LOG_INFO("Received hotkey: " + hotkey);
-        if (hotkey == NAV_LEFT_KEYVAL){
+    else if (request.hasOwnProperty(BUILT_IN_HOTKEY_MSG)) {
+        const hotkey = request[BUILT_IN_HOTKEY_MSG];
+        LOG_INFO("Received built-in hotkey: " + hotkey);
+        if (hotkey == NAV_LEFT_CODE){
             leftRightNavOrMove(-1, false);
         }
-        else if (hotkey == NAV_RIGHT_KEYVAL){
+        else if (hotkey == NAV_RIGHT_CODE){
             leftRightNavOrMove(1, false);
         }
-        else if (hotkey == MOVE_LEFT_KEYVAL){
+        else if (hotkey == MOVE_LEFT_CODE){
             leftRightNavOrMove(-1, true);
         }
-        else if (hotkey == MOVE_RIGHT_KEYVAL){
+        else if (hotkey == MOVE_RIGHT_CODE){
             leftRightNavOrMove(1, true);
         }
-        else if (hotkey == TAB_CLOSE_KEYVAL) {
+        else if (hotkey == TAB_CLOSE_CODE) {
             closeCurrentTab();
         }
-        else if (hotkey == TAB_SEARCH_KEYVAL) {
+        else if (hotkey == TAB_SEARCH_CODE) {
             openTabSearch();
         }
-        else if (hotkey == NAV_PREVIOUS_KEYVAL) {
+        else if (hotkey == NAV_PREVIOUS_CODE) {
             navigateToPreviousTab();
         }
-        else if (hotkey == TAB_NEW_KEYVAL) {
+        else if (hotkey == TAB_NEW_CODE) {
             openNewTab();
         }
-        else {
-            handleCustomHotkey(hotkey);
-        }
+    }
+    else if (request.hasOwnProperty(HOTKEY_MSG)){
+        const hotkey = request[HOTKEY_MSG];
+        LOG_INFO("Received hotkey: " + hotkey);
+        handleCustomHotkey(hotkey);
     }
     // Refresh options after edit.
     else if (request.hasOwnProperty(REFRESH_MSG)) {

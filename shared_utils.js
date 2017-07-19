@@ -1,9 +1,10 @@
 /* Messaging request keys */
+var BUILT_IN_HOTKEY_MSG = "built_in_hotkey";
 var HOLD_KEY_MSG = "hold_key";
 var HOTKEY_MSG = "hotkey";
 var REFRESH_MSG = "refresh";
-var UPDATE_HOLD_KEY_MSG = "update_hold_key";
 var TAB_ID_KEY = "tab_id";
+var UPDATE_HOLD_KEY_MSG = "update_hold_key";
 var WINDOW_ID_KEY = "window_id";
 
 // Chrome tabs API functions options keys.
@@ -14,26 +15,26 @@ var FOCUSED = "focused";
 var URL = "url";
 var INDEX = "index";
 
-/* Chrome e.key values */
+/* Chrome KeyboardEvent.code values */
 // TODO: Allow customization of these.
-var NAV_LEFT_KEYVAL = "[";
-var NAV_RIGHT_KEYVAL = "]";
-var MOVE_LEFT_KEYVAL = "{";
-var MOVE_RIGHT_KEYVAL = "}";
-var TAB_CLOSE_KEYVAL = ";";
-var TAB_SEARCH_KEYVAL = "/";
-var TAB_NEW_KEYVAL = ".";
-var NAV_PREVIOUS_KEYVAL = " ";
+var NAV_LEFT_CODE = "BracketLeft";
+var NAV_RIGHT_CODE = "BracketRight";
+var MOVE_LEFT_CODE = "BracketLeft.Shift";
+var MOVE_RIGHT_CODE = "BracketRight.Shift";
+var TAB_CLOSE_CODE = "Semicolon";
+var TAB_SEARCH_CODE = "Slash";
+var TAB_NEW_CODE = "Period";
+var NAV_PREVIOUS_CODE = "Space";
 
 var BUILT_IN_HOTKEYS = [
-    NAV_LEFT_KEYVAL,
-    NAV_RIGHT_KEYVAL,
-    MOVE_LEFT_KEYVAL,
-    MOVE_RIGHT_KEYVAL,
-    TAB_CLOSE_KEYVAL,
-    TAB_SEARCH_KEYVAL,
-    NAV_PREVIOUS_KEYVAL,
-    TAB_NEW_KEYVAL
+    NAV_LEFT_CODE,
+    NAV_RIGHT_CODE,
+    MOVE_LEFT_CODE,
+    MOVE_RIGHT_CODE,
+    TAB_CLOSE_CODE,
+    TAB_SEARCH_CODE,
+    NAV_PREVIOUS_CODE,
+    TAB_NEW_CODE
 ];
 
 // For tab search page.
@@ -45,9 +46,16 @@ var ARROW_DOWN_KEYVAL = "ArrowDown";
 var SEARCH_URL = "tab_search.html";
 var ICON_48_URL = "icons/icon48.png";
 
+/* JavaScript KeyboardEvent.key values for modifier keys */
+var ESCAPE = "Escape";
+var CONTROL = "Control";
+var ALT = "Alt";
+var META = "Meta";
+var CONTEXT_MENU = "ContextMenu";
+
 /* Chrome storage keys and default values */
 var HOLD_KEY_KEY = "hold_key";
-var HOLD_KEY_DEFAULT = "Escape";
+var HOLD_KEY_DEFAULT = ESCAPE;
 var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
 var HOTKEY_KEY = "hotkey";
@@ -60,6 +68,15 @@ var INPUT = "input";
 var KEYDOWN = "keydown";
 var KEYPRESS = "keypress";
 var KEYUP = "keyup";
+
+/* JavaScript KeyboardEvent.code prefixes */
+var ALPHA_PREFIX = "Key";
+
+/* Mapping JavaScript KeyboardEvent keys to KeyboardEvent properties */
+var KEY_TO_PROP = {};
+KEY_TO_PROP[CONTROL] = "ctrlKey";
+KEY_TO_PROP[ALT] = "altKey";
+KEY_TO_PROP[META] = "metaKey";
 
 /* Logging helpers */
 var ERROR_LEVEL = 0;
