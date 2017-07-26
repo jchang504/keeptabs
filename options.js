@@ -14,8 +14,13 @@ var INPUT_ALWAYS_SELECTOR = 'input[name="always"]';
 var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
 var SAVE_BUTTON_SELECTOR = '#save';
+var CLOSE_BUTTON_SELECTOR = '#close';
 var CHECKED = 'checked';
 var DISABLED = 'disabled';
+// Messages.
+var UNSAVED_WARNING_MSG = "You may have unsaved changes. Are you sure you want to close without saving them?";
+var CLOSE_BUTTON_SAVED_MSG = "Close";
+var CLOSE_BUTTON_UNSAVED_MSG = "Close (drops unsaved changes)";
 
 var HOTKEY_ENTRY_HTML = ' \
     <tr> \
@@ -55,9 +60,9 @@ function unsetMatchPrefixToTarget(jq_hotkey_entry_row) {
 function addHotkeyEntry() {
     $(HOTKEY_ENTRYS_TABLE_SELECTOR).append(HOTKEY_ENTRY_HTML);
     var jq_hotkey_entry_row = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
-    // Enable the save button on input or change (for checkboxes) events.
+    // Enable the save button on input (or change for checkboxes) events.
     jq_hotkey_entry_row.find(INPUTTABLE_ELEMENT_SELECTOR).on(INPUT,
-            enableSaveButton).change(enableSaveButton);
+            markUnsaved).change(markUnsaved);
     // Uncheck "Always open new tab" and set match prefix to mirror target
     // iff "Use target as match prefix" is checked.
     jq_hotkey_entry_row.find(INPUT_USE_TARGET_SELECTOR).change(function() {
@@ -87,7 +92,7 @@ function addHotkeyEntry() {
     });
     jq_hotkey_entry_row.find(HOTKEY_ENTRY_DELETE_SELECTOR).click(function() {
         jq_hotkey_entry_row.remove();
-        enableSaveButton();
+        markUnsaved();
     });
 }
 
@@ -142,6 +147,7 @@ function prepareMatchPrefix(user_prefix) {
         end_of_domain_index = user_prefix.indexOf("/",
                 scheme_delimiter_index + 3);
     }
+    // If no slash within the prefix (bare domain), add a slash at the end.
     if (end_of_domain_index == -1) {
         user_prefix += "/";
     }
@@ -199,8 +205,9 @@ function saveOptions() {
     }, function() {
         LOG_INFO("Sending refresh request to background script");
         chrome.runtime.sendMessage({[REFRESH_MSG]: true});
-        // Disable save button to indicate that options are saved.
+        // Disable save button and reset close button text.
         $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
+        $(CLOSE_BUTTON_SELECTOR).val(CLOSE_BUTTON_SAVED_MSG);
     });
     return false;
 }
@@ -217,8 +224,22 @@ function restoreOptions() {
     });
 }
 
-function enableSaveButton() {
+function markUnsaved() {
     $(SAVE_BUTTON_SELECTOR).prop(DISABLED, false);
+    $(CLOSE_BUTTON_SELECTOR).val(CLOSE_BUTTON_UNSAVED_MSG);
+}
+
+// If there are unsaved changes, gives the user a confirmation dialog
+// (OK/cancel) before closing.
+function warnIfUnsaved() {
+    if (!$(SAVE_BUTTON_SELECTOR).prop(DISABLED) &&
+        // Chromium bug makes alert/confirm/prompt not work in options within
+        // extension page; using workaround from
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=476350.
+        !chrome.extension.getBackgroundPage().confirm(UNSAVED_WARNING_MSG)) {
+            return;
+    }
+    window.close();
 }
 
 // Load stored options.
@@ -230,5 +251,6 @@ $(ADD_HOTKEY_ENTRY_BUTTON_SELECTOR).click(addHotkeyEntry);
 // Set up save button.
 $(OPTIONS_FORM_SELECTOR).submit(saveOptions);
 $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
-// Enable the save button on input events.
-$(INPUTTABLE_ELEMENT_SELECTOR).on(INPUT, enableSaveButton);
+
+// Set up the close button.
+$(CLOSE_BUTTON_SELECTOR).click(warnIfUnsaved);
