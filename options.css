@@ -1,7 +1,5 @@
 body {
-    background-image: url("icons/optionsbg.png");
-    background-size: 100%;
-    margin: 1em;
+    background-color: lightgrey;
 }
 
 #hold_key_description {
@@ -9,9 +7,9 @@ body {
 }
 
 input[name="target"], input[name="match_prefix"] {
-    width: 300px;
+    width: 30em;
 }
 
 input[name="hotkey"] {
-    width: 50px;
+    width: 3em;
 }
