@@ -1,6 +1,10 @@
 var BODY_SELECTOR = "body";
 // NOTE: This section is tightly coupled with the CSS in overlay.css.
-var OVERLAY_HTML = '<div id="overlay"><img><span></span></div>';
+var OVERLAY_HTML = '\
+    <div id="overlay">\
+        <img>\
+        <span></span>\
+    </div>';
 var OVERLAY_SELECTOR = "#overlay";
 var OVERLAY_HOLDING_CLASS = "holding";
 var OVERLAY_IMG_SELECTOR = "#overlay > img";
@@ -18,10 +22,9 @@ var hotkey = "";
 function setHoldKeyStatus(is_holding) {
     holding = is_holding;
     if (is_holding) {
-        $(OVERLAY_SELECTOR).addClass(OVERLAY_HOLDING_CLASS);
-    }
-    else {
-        $(OVERLAY_SELECTOR).removeClass(OVERLAY_HOLDING_CLASS);
+        $(OVERLAY_SELECTOR).show();
+    } else {
+        $(OVERLAY_SELECTOR).hide();
     }
 }
 
@@ -101,5 +104,5 @@ chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_DEFAULT}, function(items) {
 $(document).ready(function() {
     // Add visual overlay UI.
     $(BODY_SELECTOR).append(OVERLAY_HTML);
-    $(OVERLAY_IMG_SELECTOR).prop(SRC, chrome.extension.getURL(ICON_48_URL));
+    $(OVERLAY_IMG_SELECTOR).prop(SRC, chrome.extension.getURL(ICON_128_URL));
 });

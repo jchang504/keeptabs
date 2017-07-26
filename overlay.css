@@ -7,22 +7,34 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
     /*
      * Other styling.
-     * TODO: Needs font and such to normalize (otherwise there are differences
-     * across sites, which looks funny).
      */
     display: none;
     background-color: rgba(50, 50, 50, 0.7);
+    box-sizing: content-box;
+    margin: 0;
     padding: 10px;
+    line-height: initial;
+    font-size: initial;
+    font-family: helvetica, sans-serif;
+    z-index: 103;  /* > 102 necessary for google.com */
+}
+
+#overlay > img {
+    max-height: 128px;  /* Source image height is 128 */
+    height: 5em;
+    /*
+     * For vertical centering of hotkey text
+     */
+    vertical-align: middle;
 }
 
 #overlay > span {
-    margin-left: 10px;
+    font-size: 2em;
     color: white;
-}
-
-#overlay.holding {
-    display: block;
+    /*
+     * For vertical centering of hotkey text
+     */
+    vertical-align: middle;
 }
