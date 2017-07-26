@@ -168,22 +168,10 @@ function restoreHotkeyEntrys(hotkeys) {
                 hotkeys[i][HOTKEY_KEY]);
         jq_hotkey_entry_row.find(INPUT_TARGET_SELECTOR).val(
                 hotkeys[i][TARGET_KEY]);
-// TODO: Remove this code after users have transitioned to the updated
-// options. Sets any missing values to false (default).
-        if (!hotkeys[i].hasOwnProperty(USE_TARGET_KEY)) {
-            hotkeys[i][USE_TARGET_KEY] = false;
-        }
-// End remove section.
         jq_hotkey_entry_row.find(INPUT_USE_TARGET_SELECTOR).prop(CHECKED,
                 hotkeys[i][USE_TARGET_KEY]);
         jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR).val(
                 hotkeys[i][MATCH_PREFIX_KEY]);
-// TODO: Remove this code after users have transitioned to the updated
-// options. Sets any missing values to false (default).
-        if (!hotkeys[i].hasOwnProperty(ALWAYS_KEY)) {
-            hotkeys[i][ALWAYS_KEY] = false;
-        }
-// End remove section.
         jq_hotkey_entry_row.find(INPUT_ALWAYS_SELECTOR).prop(CHECKED,
                 hotkeys[i][ALWAYS_KEY]);
         // If "Use target as match prefix" is checked, make match prefix mirror
