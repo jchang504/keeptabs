@@ -24,13 +24,12 @@
         </select>
         <h2>Customize hotkeys</h2>
         <p>
-            Hit a <strong>Hotkey</strong> with your hold key to navigate to its
-            <strong>Target</strong>. If <strong>Deduplicate</strong> is
-            checked, KeepTabs will first check if the URL of any existing tabs
-            starts with the <strong>Match Prefix</strong>, and if so, navigate
-            to the first such existing tab (use the hotkey repeatedly to cycle
-            through all matches). If not, or if there are no existing matching
-            tabs, KeepTabs will open a new tab of the <strong>Target</strong>.
+            Hit a <strong>Hotkey</strong> with your hold key to navigate to the
+            first tab whose URL starts with the <strong>Match Prefix</strong>
+            (use the hotkey repeatedly to cycle through all matches). If there
+            are no matches, or if <strong>Always open new tab</strong> is
+            checked, KeepTabs will instead open a new tab of the
+            <strong>Target</strong>.
         </p>
         <p><strong>Syntax note</strong>: If you omit the scheme (e.g.
         "http://", "https://",) in a <strong>Target</strong>, "http://" will be
@@ -42,8 +41,9 @@
             <tr>
                 <th>Hotkey</th>
                 <th>Target</th>
-                <th>Deduplicate</th>
+                <th class="checkbox">Use target as match prefix</th>
                 <th>Match Prefix</th>
+                <th class="checkbox">Always open new tab</th>
             </tr>
         </tbody></table>
         <button id="add_hotkey">Add Hotkey</button>

@@ -52,8 +52,9 @@ var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
 var HOTKEY_KEY = "hotkey";
 var TARGET_KEY = "target";
-var DEDUPLICATE_KEY = "deduplicate";
+var USE_TARGET_KEY = "use_target";
 var MATCH_PREFIX_KEY = "match_prefix";
+var ALWAYS_KEY = "always";
 
 /* JavaScript event names */
 var INPUT = "input";

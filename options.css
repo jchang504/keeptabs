@@ -6,10 +6,33 @@ body {
     margin-bottom: 10px;
 }
 
-input[name="target"], input[name="match_prefix"] {
-    width: 30em;
+#hotkey_entry {
+    margin-bottom: 10px;
+}
+
+#hotkey_entry tr:first-child th {
+    padding-bottom: 0.5em;
 }
 
 input[name="hotkey"] {
     width: 3em;
+}
+
+input[name="target"], input[name="match_prefix"] {
+    width: 30em;
+}
+
+th.checkbox {
+    /*
+     * Allow the th text to occupy space from its neighbors.
+     */
+    display: inline-block;
+    white-space: nowrap;
+    width: 2em;
+    margin-left: -5em;  /* Hardcoded for the particular th text. */
+}
+
+td.checkbox {
+    text-align: center;
+    width: 2em;
 }

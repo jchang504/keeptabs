@@ -88,8 +88,8 @@ function loadHotkeys() {
         for (const hotkey_info of items[HOTKEYS_KEY]) {
             hotkeys_map[hotkey_info[HOTKEY_KEY]] = {
                 [TARGET_KEY]: hotkey_info[TARGET_KEY],
-                [DEDUPLICATE_KEY]: hotkey_info[DEDUPLICATE_KEY],
-                [MATCH_PREFIX_KEY]: hotkey_info[MATCH_PREFIX_KEY]
+                [MATCH_PREFIX_KEY]: hotkey_info[MATCH_PREFIX_KEY],
+                [ALWAYS_KEY]: hotkey_info[ALWAYS_KEY]
             };
         }
     });
@@ -169,11 +169,12 @@ function handleCustomHotkey(hotkey) {
         LOG_INFO("Activate custom hotkey: " + normalized);
         var hotkey_info = hotkeys_map[normalized];
         var target = hotkey_info[TARGET_KEY];
-        // Only deduplicate if checked in options and not overridden by capital
-        // letter in hotkey.
-        var deduplicate = hotkey_info[DEDUPLICATE_KEY] && hotkey == normalized;
-        if (!deduplicate) {
-            LOG_INFO("Not deduplicating; create new tab of target: " + target);
+        // If "Always open new tab" checked or indicated with capital letter in
+        // hotkey, open new tab.
+        var open_new_tab = hotkey_info[ALWAYS_KEY] || hotkey != normalized;
+        if (open_new_tab) {
+            LOG_INFO("Not checking for matches; create new tab of target: " +
+                    target);
             createNewTab(target);
         }
         else {

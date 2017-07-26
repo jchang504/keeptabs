@@ -8,8 +8,9 @@ var INPUTTABLE_ELEMENT_SELECTOR = 'input,select';
 var INPUT_TEXT_SELECTOR = 'input[type="text"]';
 var INPUT_HOTKEY_SELECTOR = 'input[name="hotkey"]';
 var INPUT_TARGET_SELECTOR = 'input[name="target"]';
-var INPUT_DEDUPLICATE_SELECTOR = 'input[name="deduplicate"]';
+var INPUT_USE_TARGET_SELECTOR = 'input[name="use_target"]';
 var INPUT_MATCH_PREFIX_SELECTOR = 'input[name="match_prefix"]';
+var INPUT_ALWAYS_SELECTOR = 'input[name="always"]';
 var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
 var SAVE_BUTTON_SELECTOR = '#save';
@@ -20,25 +21,72 @@ var HOTKEY_ENTRY_HTML = ' \
     <tr> \
         <td><input required type="text" maxlength="5" name="hotkey"></td> \
         <td><input required type="text" name="target"></td> \
-        <td><input type="checkbox" name="deduplicate"></td> \
+        <td class="checkbox"><input type="checkbox" name="use_target"></td> \
         <td><input required type="text" name="match_prefix"></td> \
+        <td class="checkbox"><input type="checkbox" name="always"></td> \
         <td><button class="delete">Delete</button></td> \
     </tr> \
 ';
 
+// The function to attach to the INPUT event handler of a target input to make
+// the corresponding match prefix mirror its value.
+function matchPrefixMirrorTarget() {
+    var jq_target = $(this);
+    jq_target.parent().parent().find(INPUT_MATCH_PREFIX_SELECTOR).val(jq_target.val());
+}
+
+// Disables the match prefix of the row and sets it to mirror the target. Also
+// unchecks "Always open in new tab", since the two are mutually exclusive.
+function setMatchPrefixToTarget(jq_hotkey_entry_row) {
+    var jq_target = jq_hotkey_entry_row.find(INPUT_TARGET_SELECTOR);
+    var jq_match_prefix = jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR);
+    jq_match_prefix.prop(DISABLED, true);
+    jq_match_prefix.val(jq_target.val());
+    jq_target.on(INPUT, matchPrefixMirrorTarget);
+}
+
+// Re-enables the match prefix input and stops it from mirroring the target.
+function unsetMatchPrefixToTarget(jq_hotkey_entry_row) {
+    jq_hotkey_entry_row.find(INPUT_TARGET_SELECTOR).off(INPUT,
+            matchPrefixMirrorTarget);
+    jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR).prop(DISABLED, false);
+}
+
 function addHotkeyEntry() {
     $(HOTKEY_ENTRYS_TABLE_SELECTOR).append(HOTKEY_ENTRY_HTML);
-    var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
+    var jq_hotkey_entry_row = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
     // Enable the save button on input or change (for checkboxes) events.
-    jqHotkeyEntryRow.find(INPUTTABLE_ELEMENT_SELECTOR).on(INPUT,
+    jq_hotkey_entry_row.find(INPUTTABLE_ELEMENT_SELECTOR).on(INPUT,
             enableSaveButton).change(enableSaveButton);
-    // Enable the match prefix input iff deduplicate is checked.
-    jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).change(function() {
-        jqHotkeyEntryRow.find(INPUT_MATCH_PREFIX_SELECTOR).prop(DISABLED,
-                !$(this).is(":" + CHECKED));
+    // Uncheck "Always open new tab" and set match prefix to mirror target
+    // iff "Use target as match prefix" is checked.
+    jq_hotkey_entry_row.find(INPUT_USE_TARGET_SELECTOR).change(function() {
+        if ($(this).is(":" + CHECKED)) {
+            var jq_always = jq_hotkey_entry_row.find(INPUT_ALWAYS_SELECTOR);
+            if (jq_always.is(":" + CHECKED)) {
+                jq_always.click();
+            }
+            setMatchPrefixToTarget(jq_hotkey_entry_row);
+        } else {
+            unsetMatchPrefixToTarget(jq_hotkey_entry_row);
+        }
     });
-    jqHotkeyEntryRow.find(HOTKEY_ENTRY_DELETE_SELECTOR).click(function() {
-        jqHotkeyEntryRow.remove();
+    // Uncheck "Use target as match prefix" and disable the match prefix input
+    // iff "Always open new tab" is checked.
+    jq_hotkey_entry_row.find(INPUT_ALWAYS_SELECTOR).change(function() {
+        var always_checked = $(this).is(":" + CHECKED);
+        if (always_checked) {
+            var jq_use_target = jq_hotkey_entry_row.find(
+                    INPUT_USE_TARGET_SELECTOR);
+            if (jq_use_target.is(":" + CHECKED)) {
+                jq_use_target.click();
+            }
+        }
+        jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR).prop(DISABLED,
+                always_checked);
+    });
+    jq_hotkey_entry_row.find(HOTKEY_ENTRY_DELETE_SELECTOR).click(function() {
+        jq_hotkey_entry_row.remove();
         enableSaveButton();
     });
 }
@@ -52,17 +100,20 @@ function getHotkeyEntrys() {
         var jq_input_target = jq_this.find(INPUT_TARGET_SELECTOR);
         var target = prepareTarget(jq_input_target.val());
         jq_input_target.val(target);
-        var deduplicate = jq_this.find(INPUT_DEDUPLICATE_SELECTOR).is(":" +
-                CHECKED);
+        var use_target = 
+            jq_this.find(INPUT_USE_TARGET_SELECTOR).is(":" + CHECKED);
         // Prepare match prefix and display changes for transparency.
         jq_input_match_prefix = jq_this.find(INPUT_MATCH_PREFIX_SELECTOR);
         var match_prefix = prepareMatchPrefix(jq_input_match_prefix.val());
         jq_input_match_prefix.val(match_prefix);
+        var always_open_new_tab =
+            jq_this.find(INPUT_ALWAYS_SELECTOR).is(":" + CHECKED);
         hotkeys.push({
             [HOTKEY_KEY]: hotkey,
             [TARGET_KEY]: target,
-            [DEDUPLICATE_KEY]: deduplicate,
-            [MATCH_PREFIX_KEY]: match_prefix
+            [USE_TARGET_KEY]: use_target,
+            [MATCH_PREFIX_KEY]: match_prefix,
+            [ALWAYS_KEY]: always_open_new_tab
         });
     });
     return hotkeys;
@@ -112,18 +163,41 @@ function restoreHotkeyEntrys(hotkeys) {
     hotkeys.sort(compareHotkey);
     for (var i = 0; i < hotkeys.length; i++) {
         addHotkeyEntry();
-        var jqHotkeyEntryRow = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
-        jqHotkeyEntryRow.find(INPUT_HOTKEY_SELECTOR).val(
+        var jq_hotkey_entry_row = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
+        jq_hotkey_entry_row.find(INPUT_HOTKEY_SELECTOR).val(
                 hotkeys[i][HOTKEY_KEY]);
-        jqHotkeyEntryRow.find(INPUT_TARGET_SELECTOR).val(
+        jq_hotkey_entry_row.find(INPUT_TARGET_SELECTOR).val(
                 hotkeys[i][TARGET_KEY]);
-        jqHotkeyEntryRow.find(INPUT_DEDUPLICATE_SELECTOR).prop(CHECKED,
-                hotkeys[i][DEDUPLICATE_KEY]);
-        jqHotkeyEntryRow.find(INPUT_MATCH_PREFIX_SELECTOR).val(
+// TODO: Remove this code after users have transitioned to the updated
+// options. Sets any missing values to false (default).
+        if (!hotkeys[i].hasOwnProperty(USE_TARGET_KEY)) {
+            hotkeys[i][USE_TARGET_KEY] = false;
+        }
+// End remove section.
+        jq_hotkey_entry_row.find(INPUT_USE_TARGET_SELECTOR).prop(CHECKED,
+                hotkeys[i][USE_TARGET_KEY]);
+        jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR).val(
                 hotkeys[i][MATCH_PREFIX_KEY]);
-        // Enable the match prefix input iff deduplicate is checked.
-        jqHotkeyEntryRow.find(INPUT_MATCH_PREFIX_SELECTOR).prop(DISABLED,
-                !hotkeys[i][DEDUPLICATE_KEY]);
+// TODO: Remove this code after users have transitioned to the updated
+// options. Sets any missing values to false (default).
+        if (!hotkeys[i].hasOwnProperty(ALWAYS_KEY)) {
+            hotkeys[i][ALWAYS_KEY] = false;
+        }
+// End remove section.
+        jq_hotkey_entry_row.find(INPUT_ALWAYS_SELECTOR).prop(CHECKED,
+                hotkeys[i][ALWAYS_KEY]);
+        // If "Use target as match prefix" is checked, make match prefix mirror
+        // target.
+        if (hotkeys[i][USE_TARGET_KEY]) {
+            setMatchPrefixToTarget(jq_hotkey_entry_row);
+        } else {
+            unsetMatchPrefixToTarget(jq_hotkey_entry_row);
+        }
+        // Disable the match prefix input iff "Always open new tab" is checked.
+        if (hotkeys[i][ALWAYS_KEY]) {
+            jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR).prop(
+                    DISABLED, true);
+        }
     }
 }
 
