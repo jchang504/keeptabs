@@ -1,19 +1,53 @@
-html {
-    min-width: 400px;
+#search_bar, #search_results {
+    display: none;
 }
 
-#results tr.selected td {
-    background-color: #cfe3e8;
+#search_bar > label {
+    vertical-align: middle;
+    color: white;
+    font-size: 1.5em;
+    margin: 0.5em;
+}
+
+#search_bar > input {
+    vertical-align: middle;
+}
+
+#search_results {
+    max-height: 80%;
+    overflow: auto;
+}
+
+#search_results a {
+    color: rgb(210, 230, 235);
+}
+
+#search_results a:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#search_results td {
+    padding: 1em;
+}
+
+#search_results p {
+    margin-top: 0;
+    margin-bottom: 0.25em;
+}
+
+#search_results tr.selected td {
+    background-color: rgb(39, 73, 93);
 }
 
 .result-title {
+    color: white;
     font-size: 1.2em;
-    color: black;
-    margin-bottom:0px;
 }
 
 .favicon {
-    max-height: 1.2em;
-    max-width: 1.2em;
-    margin-right: 5px;
+    max-height: 1em;
+    max-width: 1em;
+    vertical-align: middle;
+    margin-right: 0.5em;
 }

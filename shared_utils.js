@@ -3,6 +3,8 @@ var HOLD_KEY_MSG = "hold_key";
 var HOTKEY_MSG = "hotkey";
 var REFRESH_MSG = "refresh";
 var UPDATE_HOLD_KEY_MSG = "update_hold_key";
+var SEARCH_TABS_MSG = "search_tabs";
+var SEARCH_SELECT_MSG = "search_select";
 var TAB_ID_KEY = "tab_id";
 var WINDOW_ID_KEY = "window_id";
 

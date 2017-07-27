@@ -1,5 +1,6 @@
 body {
     background-color: lightgrey;
+    min-width: 750px;
 }
 
 #hold_key_description {
@@ -19,7 +20,7 @@ input[name="hotkey"] {
 }
 
 input[name="target"], input[name="match_prefix"] {
-    width: 30em;
+    width: 25em;
 }
 
 th.checkbox {

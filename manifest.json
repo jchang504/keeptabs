@@ -10,7 +10,7 @@
     ],
     "browser_action": {
           "default_icon": "icons/icon48.png",
-          "default_popup": "tab_search.html"
+          "default_popup": "options.html"
     },
     "background": {
       "scripts": ["shared_utils.js", "background.js"]
@@ -18,8 +18,8 @@
 
     "content_scripts": [{
         "matches": ["<all_urls>"],
-        "js": ["jquery-3.2.1.min.js", "shared_utils.js", "hotkeys.js"],
-        "css": ["overlay.css"],
+        "js": ["jquery-3.2.1.min.js", "shared_utils.js", "hotkeys.js", "fuse.js", "tab_search.js"],
+        "css": ["overlay.css", "tab_search.css"],
         "run_at": "document_start"
     }],
     "web_accessible_resources": [

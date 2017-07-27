@@ -95,12 +95,6 @@ function loadHotkeys() {
     });
 }
 
-// Open a new tab of the tab search page.
-function openTabSearch() {
-    LOG_INFO("Open tab search");
-    createNewTab(SEARCH_URL);
-}
-
 // Navigate to the most recently active still-existing tab before the current
 // tab. Useful for quick alt+tab style switching between two tabs.
 function navigateToPreviousTab() {
@@ -247,7 +241,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             closeCurrentTab();
         }
         else if (hotkey == TAB_SEARCH_KEYVAL) {
-            openTabSearch();
+            LOG_INFO("Open tab search on current tab");
+            chrome.tabs.query({}, function(tabs) {
+                sendResponse({[SEARCH_TABS_MSG]: tabs});
+            });
+            // Indicate that sendResponse will be called asynchronously; keep
+            // the channel open. See https://stackoverflow.com/a/20077854.
+            return true;
         }
         else if (hotkey == NAV_PREVIOUS_KEYVAL) {
             navigateToPreviousTab();
@@ -264,6 +264,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         LOG_INFO("Received refresh request");
         updateHoldKey();
         loadHotkeys();
+    }
+    // Received search selection; navigate to it.
+    else if (request.hasOwnProperty(SEARCH_SELECT_MSG)) {
+        LOG_INFO("Received search selection");
+        var search_selection = request[SEARCH_SELECT_MSG];
+        navigateToTab(search_selection[TAB_ID_KEY],
+                search_selection[WINDOW_ID_KEY]);
     }
 });
 

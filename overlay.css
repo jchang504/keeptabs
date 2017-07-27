@@ -12,7 +12,7 @@
      */
     display: none;
     background-color: rgba(50, 50, 50, 0.7);
-    box-sizing: content-box;
+    box-sizing: border-box;
     margin: 0;
     padding: 10px;
     line-height: initial;
