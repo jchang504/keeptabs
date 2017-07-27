@@ -14,7 +14,7 @@
     background-color: rgba(50, 50, 50, 0.7);
     box-sizing: border-box;
     margin: 0;
-    padding: 10px;
+    padding: 0.5em;
     line-height: initial;
     font-size: initial;
     font-family: helvetica, sans-serif;
@@ -23,7 +23,9 @@
 
 #overlay > img {
     max-height: 128px;  /* Source image height is 128 */
-    height: 5em;
+    height: 5em !important;
+    margin: 0;
+    padding: 0;
     /*
      * For vertical centering of hotkey text
      */
