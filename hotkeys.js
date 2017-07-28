@@ -94,7 +94,7 @@ function keydownHandler(e) {
         }
     }
     // Ignore hold key when in tab search.
-    else {
+    if (!in_tab_search) {
         // When hold key pressed, block text entry and wait for hotkey.
         if (e.key == hold_key) {
             if (!holding) {
