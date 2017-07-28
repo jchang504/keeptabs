@@ -29,7 +29,6 @@
         "page": "options.html",
         "chrome_style": true
     },
-    "options_page": "options.html",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",

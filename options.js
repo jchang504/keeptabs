@@ -33,6 +33,12 @@ var HOTKEY_ENTRY_HTML = ' \
     </tr> \
 ';
 
+// If the popup is open, assume the current options page is in the popup. It
+// works because even if you have the options page open on chrome://extensions,
+// you can't interact with it while you have the popup open, so only one of the
+// options pages can ever be active at a time.
+var IN_POPUP = chrome.extension.getViews({type: "popup"}).length > 0;
+
 // The function to attach to the INPUT event handler of a target input to make
 // the corresponding match prefix mirror its value.
 function matchPrefixMirrorTarget() {
@@ -232,12 +238,19 @@ function markUnsaved() {
 // If there are unsaved changes, gives the user a confirmation dialog
 // (OK/cancel) before closing.
 function warnIfUnsaved() {
-    if (!$(SAVE_BUTTON_SELECTOR).prop(DISABLED) &&
+    if (!$(SAVE_BUTTON_SELECTOR).prop(DISABLED)) {
+        if (IN_POPUP) {
+            if (!confirm(UNSAVED_WARNING_MSG)) {
+                return;
+            }
+        }
         // Chromium bug makes alert/confirm/prompt not work in options within
         // extension page; using workaround from
         // https://bugs.chromium.org/p/chromium/issues/detail?id=476350.
-        !chrome.extension.getBackgroundPage().confirm(UNSAVED_WARNING_MSG)) {
+        else if (!chrome.extension.getBackgroundPage()
+                .confirm(UNSAVED_WARNING_MSG)) {
             return;
+        }
     }
     window.close();
 }
