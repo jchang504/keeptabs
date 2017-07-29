@@ -70,27 +70,42 @@ function openTabSearch() {
     });
 }
 
+// Close the tab search UI.
+function closeTabSearch() {
+    in_tab_search = false;
+    $(OVERLAY_SELECTOR).hide();
+    $(SEARCH_BAR_SELECTOR + ", " + SEARCH_RESULTS_SELECTOR).hide();
+    $(OVERLAY_SELECTOR).css(OVERLAY_ANIMATION_UNDO);
+}
+
 function sendHotkeyMessage(hotkey) {
     LOG_INFO("Send hotkey: " + hotkey);
     chrome.runtime.sendMessage({[HOTKEY_MSG]: hotkey}, function(response) {
         // If the background script responds with a SEARCH_TABS_MSG, then this
         // tab sent a tab search hotkey and should open up the search UI with
         // response tabs.
-        if (response.hasOwnProperty(SEARCH_TABS_MSG)) {
+        if (response && response.hasOwnProperty(SEARCH_TABS_MSG)) {
             search_tabs = response[SEARCH_TABS_MSG];
             openTabSearch();
         }
     });
 }
 
+// Extract the letter typed from the keydown_event, including capitalization.
+function extractLetter(keydown_event) {
+    const code = keydown_event.code;
+    var letter = code.charAt(code.length - 1);
+    if (!keydown_event[SHIFT_MODIFIER]) {
+        letter = letter.toLowerCase();
+    }
+    return letter;
+}
+
 function keydownHandler(e) {
     // For cancelling tab search.
     if (in_tab_search) {
         if (e.key == hold_key) {
-            in_tab_search = false;
-            $(OVERLAY_SELECTOR).hide();
-            $(SEARCH_BAR_SELECTOR + ", " + SEARCH_RESULTS_SELECTOR).hide();
-            $(OVERLAY_SELECTOR).css(OVERLAY_ANIMATION_UNDO);
+            closeTabSearch();
         }
     }
     // Ignore hold key when in tab search.
@@ -99,28 +114,44 @@ function keydownHandler(e) {
         if (e.key == hold_key) {
             if (!holding) {
                 LOG_INFO("Holding for hotkey...");
-                chrome.runtime.sendMessage({[HOLD_KEY_MSG]: true});
                 setHoldKeyStatus(true);
             }
-            // Prevent default behavior of hold key.
+            e.stopImmediatePropagation();
             e.preventDefault();
         }
-        if (holding) {
-            // Capture [A-Za-z].
-            var ascii_value = e.key.charCodeAt(0);
-            if (e.key.length == 1 &&
-                65 <= ascii_value && ascii_value <= 90 ||
-                97 <= ascii_value && ascii_value <= 122) {
-                setHotkeyString(hotkey + e.key);
+        // If keydown event shows hold key pressed with built in hotkey,
+        // activate regardless of whether holding == true. Turn off the holding
+        // indicator.
+        else if (e[HOLD_KEY_TO_MODIFIER[hold_key]] &&
+                BUILT_IN_HOTKEYS.includes(e.code)) {
+            var modified_code = e.code;
+            if (e[SHIFT_MODIFIER]) {
+                modified_code += SHIFT;
             }
-            // Capture built-in hotkeys. Send them immediately so that the user
-            // can repeatedly use them without releasing the hold key.
-            else if (BUILT_IN_HOTKEYS.includes(e.key)) {
-                sendHotkeyMessage(e.key);
-                setHotkeyString("");
+            sendHotkeyMessage(modified_code);
+            setHotkeyString("");
+            // Don't turn off hold key indicator for tab search animation.
+            if (e.code != TAB_SEARCH_CODE) {
+                setHoldKeyStatus(false);
             }
-            e.stopPropagation();
+            e.stopImmediatePropagation();
             e.preventDefault();
+        }
+        else if (holding) {
+            // Capture [A-Za-z].
+            if (e.code.startsWith(ALPHA_PREFIX)) {
+                const letter = extractLetter(e);
+                setHotkeyString(hotkey + letter);
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+            // Cancel holding on non-alphabetic keys, except for shift.
+            else if (e.key != SHIFT) {
+                setHotkeyString("");
+                setHoldKeyStatus(false);
+                // Don't stop propagation and prevent default here, to allow
+                // non-alphabetic browser and site shortcuts.
+            }
         }
     }
 }
@@ -135,20 +166,23 @@ function keyupHandler(e) {
                 sendHotkeyMessage(hotkey);
                 setHotkeyString("");
             }
-            e.stopPropagation();
             LOG_INFO("Released for hotkey.");
-            chrome.runtime.sendMessage({[HOLD_KEY_MSG]: false});
             setHoldKeyStatus(false);
+            e.stopImmediatePropagation();
+            e.preventDefault();
         }
     }
 }
 
-// Listen for globally broadcasted hold key events and update own state.
+// Listen for hold key release and options changes messages.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.hasOwnProperty(HOLD_KEY_MSG)) {
-        setHoldKeyStatus(request[HOLD_KEY_MSG]);
-        var hold_event_type = holding ? "pressed" : "released";
-        LOG_INFO("Received hold key " + hold_event_type);
+    // Release the hold key on window change to prevent sticking.
+    if (request.hasOwnProperty(HOLD_RELEASE_MSG)) {
+        LOG_INFO("Received hold release; releasing hold key");
+        if (in_tab_search) {
+            closeTabSearch();
+        }
+        setHoldKeyStatus(false);
     }
     else if (request.hasOwnProperty(UPDATE_HOLD_KEY_MSG)) {
         hold_key = request[UPDATE_HOLD_KEY_MSG];

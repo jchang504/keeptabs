@@ -1,10 +1,10 @@
 /* Messaging request keys */
-var HOLD_KEY_MSG = "hold_key";
 var HOTKEY_MSG = "hotkey";
 var REFRESH_MSG = "refresh";
 var UPDATE_HOLD_KEY_MSG = "update_hold_key";
 var SEARCH_TABS_MSG = "search_tabs";
 var SEARCH_SELECT_MSG = "search_select";
+var HOLD_RELEASE_MSG = "hold_release";
 var TAB_ID_KEY = "tab_id";
 var WINDOW_ID_KEY = "window_id";
 
@@ -16,27 +16,47 @@ var FOCUSED = "focused";
 var URL = "url";
 var INDEX = "index";
 
-/* Chrome e.key values */
+// Chrome KeyboardEvent.key values for hold key choices and shift.
+var CONTROL = "Control";
+var ALT = "Alt";
+var META = "Meta";
+var SHIFT = "Shift";
+
+// Chrome KeyboardEvent.code values
 // TODO: Allow customization of these.
-var NAV_LEFT_KEYVAL = "[";
-var NAV_RIGHT_KEYVAL = "]";
-var MOVE_LEFT_KEYVAL = "{";
-var MOVE_RIGHT_KEYVAL = "}";
-var TAB_CLOSE_KEYVAL = ";";
-var TAB_SEARCH_KEYVAL = "/";
-var TAB_NEW_KEYVAL = ".";
-var NAV_PREVIOUS_KEYVAL = " ";
+// Nav ([/]) and move ({/}) share the same code; we add SHIFT to the end to
+// indicate when the shift modifier was on.
+var NAV_LEFT_CODE = "BracketLeft";
+var NAV_RIGHT_CODE = "BracketRight";
+var MOVE_LEFT_CODE = "BracketLeftShift";
+var MOVE_RIGHT_CODE = "BracketRightShift";
+var TAB_CLOSE_CODE = "Semicolon";
+var TAB_SEARCH_CODE = "Slash";
+var NAV_PREVIOUS_CODE = "Space";
+var TAB_NEW_CODE = "Period";
 
 var BUILT_IN_HOTKEYS = [
-    NAV_LEFT_KEYVAL,
-    NAV_RIGHT_KEYVAL,
-    MOVE_LEFT_KEYVAL,
-    MOVE_RIGHT_KEYVAL,
-    TAB_CLOSE_KEYVAL,
-    TAB_SEARCH_KEYVAL,
-    NAV_PREVIOUS_KEYVAL,
-    TAB_NEW_KEYVAL
+    NAV_LEFT_CODE,
+    NAV_RIGHT_CODE,
+    MOVE_LEFT_CODE,
+    MOVE_RIGHT_CODE,
+    TAB_CLOSE_CODE,
+    TAB_SEARCH_CODE,
+    NAV_PREVIOUS_CODE,
+    TAB_NEW_CODE
 ];
+
+// Chrome KeyboardEvent.code prefixes
+var ALPHA_PREFIX = "Key";
+
+// Maps hold key choices to KeyboardEvent modifier property.
+var HOLD_KEY_TO_MODIFIER = {
+    [CONTROL]: "ctrlKey",
+    [ALT]: "altKey",
+    [META]: "metaKey"
+}
+// Other modifiers.
+var SHIFT_MODIFIER = "shiftKey";
 
 // For tab search page.
 var ENTER_KEYVAL = "Enter";
@@ -49,7 +69,8 @@ var ICON_128_URL = "icons/icon128.png";
 
 /* Chrome storage keys and default values */
 var HOLD_KEY_KEY = "hold_key";
-var HOLD_KEY_DEFAULT = "Escape";
+// TODO: Set based on OS (#43).
+var HOLD_KEY_DEFAULT = ALT;
 var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
 var HOTKEY_KEY = "hotkey";

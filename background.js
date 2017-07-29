@@ -129,6 +129,11 @@ function addToTabHistory(tab_id) {
 // Listen for focused window changes to track active tab changes across
 // windows.
 chrome.windows.onFocusChanged.addListener(function (window_id) {
+    // Release hold key on window change (even to WINDOW_ID_NONE) to avoid
+    // sticking when using native shortcuts.
+    LOG_INFO("Send hold release to tab_id=" + tab_history[current_tab_index]);
+    chrome.tabs.sendMessage(tab_history[current_tab_index],
+            {[HOLD_RELEASE_MSG]: null});
     // Track last focused window; ignore when user is not on any window.
     if (window_id != chrome.windows.WINDOW_ID_NONE) {
         addToTabHistory(window_to_active_tab_map[window_id]);
@@ -210,37 +215,26 @@ function switchToMatchIfExists(target, match_prefix) {
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    // Hold key event (pressed or released); broadcast to all tabs.
-    if (request.hasOwnProperty(HOLD_KEY_MSG)) {
-        var pressed = request[HOLD_KEY_MSG];
-        var hold_event_type = pressed ? "pressed" : "released";
-        LOG_INFO("Broadcasting hold key " + hold_event_type);
-        chrome.tabs.query({}, function(tabs) {
-            for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {[HOLD_KEY_MSG]: pressed});
-            }
-        });
-    }
-    // Hotkey sent.
-    else if (request.hasOwnProperty(HOTKEY_MSG)) {
-        var hotkey = request[HOTKEY_MSG];
+    // Received hotkey.
+    if (request.hasOwnProperty(HOTKEY_MSG)) {
+        const hotkey = request[HOTKEY_MSG];
         LOG_INFO("Received hotkey: " + hotkey);
-        if (hotkey == NAV_LEFT_KEYVAL){
+        if (hotkey == NAV_LEFT_CODE){
             leftRightNavOrMove(-1, false);
         }
-        else if (hotkey == NAV_RIGHT_KEYVAL){
+        else if (hotkey == NAV_RIGHT_CODE) {
             leftRightNavOrMove(1, false);
         }
-        else if (hotkey == MOVE_LEFT_KEYVAL){
+        else if (hotkey == MOVE_LEFT_CODE) {
             leftRightNavOrMove(-1, true);
         }
-        else if (hotkey == MOVE_RIGHT_KEYVAL){
+        else if (hotkey == MOVE_RIGHT_CODE) {
             leftRightNavOrMove(1, true);
         }
-        else if (hotkey == TAB_CLOSE_KEYVAL) {
+        else if (hotkey == TAB_CLOSE_CODE) {
             closeCurrentTab();
         }
-        else if (hotkey == TAB_SEARCH_KEYVAL) {
+        else if (hotkey == TAB_SEARCH_CODE) {
             LOG_INFO("Open tab search on current tab");
             chrome.tabs.query({}, function(tabs) {
                 sendResponse({[SEARCH_TABS_MSG]: tabs});
@@ -249,12 +243,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             // the channel open. See https://stackoverflow.com/a/20077854.
             return true;
         }
-        else if (hotkey == NAV_PREVIOUS_KEYVAL) {
+        else if (hotkey == NAV_PREVIOUS_CODE) {
             navigateToPreviousTab();
         }
-        else if (hotkey == TAB_NEW_KEYVAL) {
+        else if (hotkey == TAB_NEW_CODE) {
             openNewTab();
         }
+        // Custom hotkey.
         else {
             handleCustomHotkey(hotkey);
         }
