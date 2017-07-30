@@ -5,7 +5,6 @@ var HOTKEY_ENTRY_ROWS_SELECTOR = '#hotkey_entry tr:not(:first-child)';
 var HOTKEY_ENTRY_LAST_ROW_SELECTOR = '#hotkey_entry tr:last-child';
 var HOTKEY_ENTRY_DELETE_SELECTOR = 'input.delete';
 var HOTKEY_ENTRY_RESTORE_SELECTOR = 'input.restore';
-var INPUTTABLE_ELEMENT_SELECTOR = 'input,select';
 var INPUT_SELECTOR = 'input';
 var BUTTON_TYPE_SELECTOR = '[type="button"]';
 var INPUT_TEXT_SELECTOR = 'input[type="text"]';
@@ -72,8 +71,8 @@ function addHotkeyEntry() {
     $(HOTKEY_ENTRYS_TABLE_SELECTOR).append(HOTKEY_ENTRY_HTML);
     var jq_hotkey_entry_row = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
     // Enable the save button on input (or change for checkboxes) events.
-    jq_hotkey_entry_row.find(INPUTTABLE_ELEMENT_SELECTOR).on(INPUT,
-            markUnsaved).change(markUnsaved);
+    jq_hotkey_entry_row.find(INPUT_SELECTOR).on(INPUT, markUnsaved)
+            .change(markUnsaved);
     // Uncheck "Always open new tab" and set match prefix to mirror target
     // iff "Use target as match prefix" is checked.
     jq_hotkey_entry_row.find(INPUT_USE_TARGET_SELECTOR).change(function() {
@@ -288,6 +287,7 @@ $(ADD_HOTKEY_ENTRY_BUTTON_SELECTOR).click(addHotkeyEntry);
 // Set up save button.
 $(OPTIONS_FORM_SELECTOR).submit(saveOptions);
 $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
+$(HOLD_KEY_SELECTOR).change(markUnsaved);
 
 // Set up the close button.
 $(CLOSE_BUTTON_SELECTOR).click(warnIfUnsaved);
