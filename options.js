@@ -3,14 +3,18 @@ var HOLD_KEY_SELECTOR = '#hold_key';
 var HOTKEY_ENTRYS_TABLE_SELECTOR = '#hotkey_entry > tbody';
 var HOTKEY_ENTRY_ROWS_SELECTOR = '#hotkey_entry tr:not(:first-child)';
 var HOTKEY_ENTRY_LAST_ROW_SELECTOR = '#hotkey_entry tr:last-child';
-var HOTKEY_ENTRY_DELETE_SELECTOR = 'button.delete';
+var HOTKEY_ENTRY_DELETE_SELECTOR = 'input.delete';
+var HOTKEY_ENTRY_RESTORE_SELECTOR = 'input.restore';
 var INPUTTABLE_ELEMENT_SELECTOR = 'input,select';
+var INPUT_SELECTOR = 'input';
+var BUTTON_TYPE_SELECTOR = '[type="button"]';
 var INPUT_TEXT_SELECTOR = 'input[type="text"]';
 var INPUT_HOTKEY_SELECTOR = 'input[name="hotkey"]';
 var INPUT_TARGET_SELECTOR = 'input[name="target"]';
 var INPUT_USE_TARGET_SELECTOR = 'input[name="use_target"]';
 var INPUT_MATCH_PREFIX_SELECTOR = 'input[name="match_prefix"]';
 var INPUT_ALWAYS_SELECTOR = 'input[name="always"]';
+var DELETED_CLASS = "deleted";
 var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
 var SAVE_BUTTON_SELECTOR = '#save';
@@ -29,7 +33,8 @@ var HOTKEY_ENTRY_HTML = ' \
         <td class="checkbox"><input type="checkbox" name="use_target"></td> \
         <td><input required type="text" name="match_prefix"></td> \
         <td class="checkbox"><input type="checkbox" name="always"></td> \
-        <td><button class="delete">Delete</button></td> \
+        <td><input class="delete" type="button" value="Delete"></input> \
+        <input class="restore" type="button" value="Restore"></input></td> \
     </tr> \
 ';
 
@@ -96,15 +101,34 @@ function addHotkeyEntry() {
         jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR).prop(DISABLED,
                 always_checked);
     });
+    // Disable the row when deleted, but still allow it to be restored.
     jq_hotkey_entry_row.find(HOTKEY_ENTRY_DELETE_SELECTOR).click(function() {
-        jq_hotkey_entry_row.remove();
+        jq_hotkey_entry_row.find(INPUT_SELECTOR).not(BUTTON_TYPE_SELECTOR)
+                .prop(DISABLED, true);
+        jq_hotkey_entry_row.find(HOTKEY_ENTRY_DELETE_SELECTOR).hide();
+        jq_hotkey_entry_row.find(HOTKEY_ENTRY_RESTORE_SELECTOR).show();
+        jq_hotkey_entry_row.addClass(DELETED_CLASS);
+        markUnsaved();
+    });
+    // Un-disable the row when restore is clicked.
+    jq_hotkey_entry_row.find(HOTKEY_ENTRY_RESTORE_SELECTOR).click(function() {
+        jq_hotkey_entry_row.find(INPUT_SELECTOR).prop(DISABLED, false);
+        // If either checkbox is checked, keep match prefix disabled.
+        if (jq_hotkey_entry_row.find(INPUT_USE_TARGET_SELECTOR)
+                .is(":" + CHECKED) || jq_hotkey_entry_row.find(
+                INPUT_ALWAYS_SELECTOR).is(":" + CHECKED)) {
+            jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR).prop(DISABLED, true);
+        }
+        jq_hotkey_entry_row.find(HOTKEY_ENTRY_RESTORE_SELECTOR).hide();
+        jq_hotkey_entry_row.find(HOTKEY_ENTRY_DELETE_SELECTOR).show();
+        jq_hotkey_entry_row.removeClass(DELETED_CLASS);
         markUnsaved();
     });
 }
 
 function getHotkeyEntrys() {
     var hotkeys = [];
-    $(HOTKEY_ENTRY_ROWS_SELECTOR).each(function() {
+    $(HOTKEY_ENTRY_ROWS_SELECTOR).not("." + DELETED_CLASS).each(function() {
         var jq_this = $(this);
         var hotkey = jq_this.find(INPUT_HOTKEY_SELECTOR).val();
         // Prepare target and display changes for transparency.
