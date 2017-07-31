@@ -15,11 +15,11 @@ body {
     padding-bottom: 0.5em;
 }
 
-input[name="hotkey"] {
+th.hotkey, input[name="hotkey"] {
     width: 3em;
 }
 
-input[name="target"], input[name="match_prefix"] {
+th.url, input[name="target"], input[name="match_prefix"] {
     width: 25em;
 }
 
