@@ -7,19 +7,30 @@
 <body>
     <h1>KeepTabs Options</h1>
     <form id="options">
-        <h2>Set hold key</h2>
-        <p id="hold_key_description">The <strong>hold key</strong> is the key
-        you hold while typing to activate your hotkeys. If it is used for
-        native shortcuts in Chrome (e.g. Ctrl+f on Windows), creating an
-        overlapping hotkey may or may not override the native shortcut.
-        Operating system shortcuts, however, will not get overridden, so choose
-        your hold key carefully to avoid side effects.</p>
-        <select id="hold_key">
-            <!-- Values are Chrome e.key values -->
-            <option value="Control">Control</option>
-            <option value="Alt">Alt/Option (Mac)</option>
-            <option value="Meta">Windows key/Cmd (Mac)</option>
-        </select>
+        <h2>Hold key</h2>
+        <p id="hold_key_description">
+            The <strong>hold key</strong> is the key you hold while typing to
+            activate your hotkeys. For most users, it is recommended that you
+            stick with the default hold key for your operating system, as it
+            has been chosen for the least interference with system and browser
+            shortcuts. If you have a customized setup and would like to change
+            your hold key, you can do so in Advanced Options at the bottom.
+        </p>
+        <div id="recommended_description">
+            <p>
+                Your operating system was detected as
+                <strong><span id="detected_os"></span></strong>. The recommended
+                hold key for your operating system is
+                <strong><span class="hold_key_name"></span></strong>.
+            </p>
+            <p>
+                <span id="extra_suggestion"></span>
+            </p>
+        </div>
+        <p id="changed_description">
+            You have changed your hotkey to <strong><span
+           class="hold_key_name"></span></strong> in Advanced Options.
+        </p>
         <h2>Customize hotkeys</h2>
         <p>
             Hit a <strong>Hotkey</strong> with your hold key to navigate to the
@@ -47,6 +58,22 @@
         <input id="add_hotkey" type="button" value="Add Hotkey"></input>
         <input id="save" type="submit" value="Save all">
         <input id="close" type="button" value="Close"></input>
+
+        <div id="open_advanced">
+            <a>Open advanced options</a>
+        </div>
+        <div id="advanced">
+            <h2>Advanced options</h2>
+            <p>Note that these options and features come with less instructions
+            and less guarantee of stability; they are recommended for
+            developers and advanced users.</p>
+            <label for="hold_key">Change hold key: </label><select id="hold_key">
+                <!-- Values are Chrome e.key values -->
+                <option value="Control">Control</option>
+                <option value="Alt"></option>
+                <option value="Meta"></option>
+            </select>
+        </div>
     </form>
 
     <script src="jquery-3.2.1.min.js"></script>

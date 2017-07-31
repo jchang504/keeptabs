@@ -189,8 +189,24 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 });
 
-chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_DEFAULT}, function(items) {
+chrome.storage.sync.get({
+    [HOLD_KEY_KEY]: HOLD_KEY_EMPTY,
+    [OS_KEY]: OS_EMPTY
+}, function(items) {
     hold_key = items[HOLD_KEY_KEY];
+    if (hold_key == HOLD_KEY_EMPTY) {
+        // No hold key saved in storage.
+        var os = items[OS_KEY];
+        if (os == OS_EMPTY) {
+            // This should never happen, unless the background script somehow
+            // failed to save the OS.
+            LOG_ERROR("No OS saved in chrome.storage.sync.");
+            hold_key = ALT;
+        }
+        else {
+            hold_key = OS_TO_DEFAULT_HOLD_KEY[os];
+        }
+    }
     // Only add listeners once hold_key has been updated from options.
     $(window).get(0).addEventListener(KEYDOWN, keydownHandler, true);
     $(window).get(0).addEventListener(KEYUP, keyupHandler, true);

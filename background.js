@@ -12,6 +12,15 @@ var current_tab_index = 0;
 // changes (this does NOT fire the active tab change listener).
 var window_to_active_tab_map = {};
 
+// Detect and save the current OS.
+function detectOs() {
+    chrome.runtime.getPlatformInfo(function(platform_info) {
+        chrome.storage.sync.set({
+            [OS_KEY]: platform_info.os
+        });
+    });
+}
+
 // Navigate to (make active) the specified tab (and focus its window, if the
 // optional argument is provided).
 function navigateToTab(tab_id, window_id) {
@@ -131,12 +140,24 @@ function addToTabHistory(tab_id) {
 chrome.windows.onFocusChanged.addListener(function (window_id) {
     // Release hold key on window change (even to WINDOW_ID_NONE) to avoid
     // sticking when using native shortcuts.
-    LOG_INFO("Send hold release to tab_id=" + tab_history[current_tab_index]);
-    chrome.tabs.sendMessage(tab_history[current_tab_index],
-            {[HOLD_RELEASE_MSG]: null});
+    var current_tab_id = tab_history[current_tab_index];
+    if (current_tab_id != undefined) {
+        LOG_INFO("Send hold release to tab_id=" +
+                tab_history[current_tab_index]);
+        chrome.tabs.sendMessage(tab_history[current_tab_index],
+                {[HOLD_RELEASE_MSG]: null});
+    }
+    else {
+        LOG_WARNING("tab_history[current_tab_index] is undefined on chrome.windows.onFocusChanged event");
+    }
     // Track last focused window; ignore when user is not on any window.
     if (window_id != chrome.windows.WINDOW_ID_NONE) {
-        addToTabHistory(window_to_active_tab_map[window_id]);
+        var new_tab = window_to_active_tab_map[window_id];
+        if (new_tab != undefined) {
+            addToTabHistory(new_tab);
+        } else {
+            LOG_WARNING("window_to_active_tab_map[window_id] is undefined on chrome.windows.onFocusChanged event");
+        }
     }
 },
 // Exclude 'app' and 'panel' WindowType (extension's own windows).
@@ -269,5 +290,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 });
 
+// Detect and save OS to determine default hold key.
+detectOs();
 // Load hotkeys at background script start.
 loadHotkeys();

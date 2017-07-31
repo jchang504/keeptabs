@@ -1,5 +1,9 @@
 // CSS selectors.
-var HOLD_KEY_SELECTOR = '#hold_key';
+var RECOMMENDED_DESCRIPTION_SELECTOR = "#recommended_description";
+var CHANGED_DESCRIPTION_SELECTOR = "#changed_description";
+var DETECTED_OS_SELECTOR = "#detected_os";
+var HOLD_KEY_NAME_SELECTOR = ".hold_key_name";
+var EXTRA_SUGGESTION_SELECTOR = "#extra_suggestion";
 var HOTKEY_ENTRYS_TABLE_SELECTOR = '#hotkey_entry > tbody';
 var HOTKEY_ENTRY_ROWS_SELECTOR = '#hotkey_entry tr:not(:first-child)';
 var HOTKEY_ENTRY_LAST_ROW_SELECTOR = '#hotkey_entry tr:last-child';
@@ -18,12 +22,28 @@ var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
 var SAVE_BUTTON_SELECTOR = '#save';
 var CLOSE_BUTTON_SELECTOR = '#close';
+var OPEN_ADVANCED_SELECTOR = "#open_advanced > a";
+var ADVANCED_SELECTOR = "#advanced";
+var HOLD_KEY_SELECTOR = '#hold_key';
+var OPTION_ALT_SELECTOR = 'option[value="Alt"]';
+var OPTION_META_SELECTOR = 'option[value="Meta"]';
 var CHECKED = 'checked';
 var DISABLED = 'disabled';
 // Messages.
 var UNSAVED_WARNING_MSG = "You may have unsaved changes. Are you sure you want to close without saving them?";
 var CLOSE_BUTTON_SAVED_MSG = "Close";
 var CLOSE_BUTTON_UNSAVED_MSG = "Close (drops unsaved changes)";
+// Maps OS to extra suggestion for reducing interference with system shortcuts.
+var OS_TO_EXTRA_SUGGESTION = {
+    [MAC_OS]: "",
+    [WINDOWS_OS]: 'You may also consider disabling the Alt+space shortcut using <a href="https://autohotkey.com/">AutoHotkey</a> to avoid interference with the KeepTabs previous tab hotkey.',
+    [ANDROID_OS]: "",
+    [CHROME_OS]: "",
+    [LINUX_OS]: "If you're on Ubuntu with Unity, it's recommended that you disable the default Alt+space (System Settings > Keyboard > Shortcuts > Windows > 'Activate the window menu') and Alt tap (System Settings > Keyboard > Shortcuts > Launchers > 'Key to show the HUD') shortcuts. Other distros: I'm sure you can figure it out; you're using Linux after all.",
+    [OPEN_BSD_OS]: ""
+};
+// Save OS so we know what the default hold key choice is.
+var OS;
 
 var HOTKEY_ENTRY_HTML = ' \
     <tr> \
@@ -241,14 +261,49 @@ function saveOptions() {
     return false;
 }
 
+// Fill in the OS-specific names of the hold key choices.
+function fillHoldKeyChoiceNames(os) {
+    $(OPTION_ALT_SELECTOR).html(OS_TO_HOLD_KEY_NAMES[os][ALT]);
+    $(OPTION_META_SELECTOR).html(OS_TO_HOLD_KEY_NAMES[os][META]);
+}
+
+// Restore all elements related to OS and hold key.
+function restoreOsAndHoldKey(os, hold_key) {
+    if (os == OS_EMPTY) {
+        // This should never happen, unless the background script
+        // somehow failed to save the OS.
+        LOG_ERROR("No OS saved in chrome.storage.sync.");
+        os = WINDOWS_OS;
+    }
+    // Save operating system in global.
+    OS = os;
+    fillHoldKeyChoiceNames(os);
+    if (hold_key == HOLD_KEY_EMPTY || hold_key == OS_TO_DEFAULT_HOLD_KEY[os]) {
+        // Use OS default hold key choice.
+        hold_key = OS_TO_DEFAULT_HOLD_KEY[os];
+        $(RECOMMENDED_DESCRIPTION_SELECTOR).show();
+        $(DETECTED_OS_SELECTOR).html(OS_TO_READABLE_NAME[os]);
+        $(EXTRA_SUGGESTION_SELECTOR).html(OS_TO_EXTRA_SUGGESTION[os]);
+    }
+    else {
+        // Hold key changed to non-default.
+        $(CHANGED_DESCRIPTION_SELECTOR).show();
+    }
+    $(HOLD_KEY_NAME_SELECTOR).html(OS_TO_HOLD_KEY_NAMES[os][hold_key]);
+    $(HOLD_KEY_SELECTOR).val(hold_key);
+}
+
 // Restores options as previously stored in chrome.storage.sync.
 function restoreOptions() {
     // Default values.
     chrome.storage.sync.get({
-            [HOLD_KEY_KEY]: HOLD_KEY_DEFAULT,
-            [HOTKEYS_KEY]: HOTKEYS_DEFAULT
-            }, function(items) {
-        $(HOLD_KEY_SELECTOR).val(items[HOLD_KEY_KEY]);
+        [OS_KEY]: OS_EMPTY,
+        [HOLD_KEY_KEY]: HOLD_KEY_EMPTY,
+        [HOTKEYS_KEY]: HOTKEYS_DEFAULT
+    }, function(items) {
+        var hold_key = items[HOLD_KEY_KEY];
+        var os = items[OS_KEY];
+        restoreOsAndHoldKey(os, hold_key);
         restoreHotkeyEntrys(items[HOTKEYS_KEY]);
     });
 }
@@ -278,16 +333,40 @@ function warnIfUnsaved() {
     window.close();
 }
 
-// Load stored options.
-$(document).ready(restoreOptions);
+function openAdvancedOptions() {
+    $(OPEN_ADVANCED_SELECTOR).hide();
+    $(ADVANCED_SELECTOR).show();
+}
 
-// Set up add button.
-$(ADD_HOTKEY_ENTRY_BUTTON_SELECTOR).click(addHotkeyEntry);
+$(document).ready(function() {
+    // Load stored options.
+    restoreOptions();
 
-// Set up save button.
-$(OPTIONS_FORM_SELECTOR).submit(saveOptions);
-$(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
-$(HOLD_KEY_SELECTOR).change(markUnsaved);
+    // Set up add button.
+    $(ADD_HOTKEY_ENTRY_BUTTON_SELECTOR).click(addHotkeyEntry);
 
-// Set up the close button.
-$(CLOSE_BUTTON_SELECTOR).click(warnIfUnsaved);
+    // Set up save button.
+    $(OPTIONS_FORM_SELECTOR).submit(saveOptions);
+    $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
+
+    // Set up hold key select element.
+    $(HOLD_KEY_SELECTOR).change(function() {
+        var new_hold_key = $(this).val();
+        $(HOLD_KEY_NAME_SELECTOR).html(OS_TO_HOLD_KEY_NAMES[OS][new_hold_key]);
+        if (new_hold_key == OS_TO_DEFAULT_HOLD_KEY[OS]) {
+            $(RECOMMENDED_DESCRIPTION_SELECTOR).show();
+            $(CHANGED_DESCRIPTION_SELECTOR).hide();
+        }
+        else {
+            $(CHANGED_DESCRIPTION_SELECTOR).show();
+            $(RECOMMENDED_DESCRIPTION_SELECTOR).hide();
+        }
+        markUnsaved();
+    });
+
+    // Set up the close button.
+    $(CLOSE_BUTTON_SELECTOR).click(warnIfUnsaved);
+
+    // Set up advanced section.
+    $(OPEN_ADVANCED_SELECTOR).click(openAdvancedOptions);
+});

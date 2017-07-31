@@ -68,9 +68,10 @@ var SEARCH_URL = "tab_search.html";
 var ICON_128_URL = "icons/icon128.png";
 
 /* Chrome storage keys and default values */
+var OS_KEY = "operating_system";
 var HOLD_KEY_KEY = "hold_key";
-// TODO: Set based on OS (#43).
-var HOLD_KEY_DEFAULT = ALT;
+// Indicates no hold key choice saved in options, so use OS default.
+var HOLD_KEY_EMPTY = null;
 var HOTKEYS_KEY = "hotkeys";
 var HOTKEYS_DEFAULT = [];
 var HOTKEY_KEY = "hotkey";
@@ -78,6 +79,78 @@ var TARGET_KEY = "target";
 var USE_TARGET_KEY = "use_target";
 var MATCH_PREFIX_KEY = "match_prefix";
 var ALWAYS_KEY = "always";
+
+// Possible values of chrome.runtime.getPlatformInfo().PlatformOS:
+var MAC_OS = "mac";
+var WINDOWS_OS = "win";
+// We should never be running on this, but in case they're faking their OS.
+var ANDROID_OS = "android";
+var CHROME_OS = "cros";
+var LINUX_OS = "linux";
+var OPEN_BSD_OS = "openbsd";
+// A dummy value -- should never get this from storage, or something's wrong.
+var OS_EMPTY = null;
+
+// Maps OS value from Chrome runtime to readable name.
+var OS_TO_READABLE_NAME = {
+    [MAC_OS]: "Mac",
+    [WINDOWS_OS]: "Windows",
+    [ANDROID_OS]: "Android",
+    [CHROME_OS]: "Chrome OS",
+    [LINUX_OS]: "Linux",
+    [OPEN_BSD_OS]: "Open BSD"
+};
+
+// Maps OS to default hold key.
+var OS_TO_DEFAULT_HOLD_KEY = {
+    [MAC_OS]: CONTROL,
+    [WINDOWS_OS]: ALT,
+    [ANDROID_OS]: ALT,
+    [CHROME_OS]: ALT,
+    [LINUX_OS]: ALT,
+    [OPEN_BSD_OS]: ALT
+};
+
+// Names for hold key choices on various OS.
+var MAC_ALT_NAME = "Option";
+var MAC_META_NAME = "Cmd";
+var WINDOWS_META_NAME = "Windows key";
+var CHROME_META_NAME = "Search key";
+var LINUX_META_NAME = "Super (Windows key)";
+
+// Maps OS to hold key choice (alt and meta) to OS-specific name.
+var OS_TO_HOLD_KEY_NAMES = {
+    [MAC_OS]: {
+        [CONTROL]: CONTROL,
+        [ALT]: MAC_ALT_NAME,
+        [META]: MAC_META_NAME
+    },
+    [WINDOWS_OS]: {
+        [CONTROL]: CONTROL,
+        [ALT]: ALT,
+        [META]: WINDOWS_META_NAME
+    },
+    [ANDROID_OS]: {
+        [CONTROL]: CONTROL,
+        [ALT]: ALT,
+        [META]: LINUX_META_NAME,
+    },
+    [CHROME_OS]: {
+        [CONTROL]: CONTROL,
+        [ALT]: ALT,
+        [META]: CHROME_META_NAME
+    },
+    [LINUX_OS]: {
+        [CONTROL]: CONTROL,
+        [ALT]: ALT,
+        [META]: LINUX_META_NAME,
+    },
+    [OPEN_BSD_OS]: {
+        [CONTROL]: CONTROL,
+        [ALT]: ALT,
+        [META]: LINUX_META_NAME,
+    }
+};
 
 /* JavaScript event names */
 var INPUT = "input";
