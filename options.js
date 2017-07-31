@@ -18,10 +18,12 @@ var INPUT_USE_TARGET_SELECTOR = 'input[name="use_target"]';
 var INPUT_MATCH_PREFIX_SELECTOR = 'input[name="match_prefix"]';
 var INPUT_ALWAYS_SELECTOR = 'input[name="always"]';
 var DELETED_CLASS = "deleted";
+var HOTKEY_ENTRY_INVALID_CLASS = 'invalid';
 var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
 var SAVE_BUTTON_SELECTOR = '#save';
 var CLOSE_BUTTON_SELECTOR = '#close';
+var WARNING_SELECTOR = '#warning';
 var OPEN_ADVANCED_SELECTOR = "#open_advanced > a";
 var ADVANCED_SELECTOR = "#advanced";
 var HOLD_KEY_SELECTOR = '#hold_key';
@@ -29,10 +31,14 @@ var OPTION_ALT_SELECTOR = 'option[value="Alt"]';
 var OPTION_META_SELECTOR = 'option[value="Meta"]';
 var CHECKED = 'checked';
 var DISABLED = 'disabled';
+var ALPHA_REGEX = /^[A-Za-z]+$/;
 // Messages.
 var UNSAVED_WARNING_MSG = "You may have unsaved changes. Are you sure you want to close without saving them?";
 var CLOSE_BUTTON_SAVED_MSG = "Close";
 var CLOSE_BUTTON_UNSAVED_MSG = "Close (drops unsaved changes)";
+var DUPLICATE_ERROR_MSG = " is already being used as a hotkey.";
+var CHARACTER_ERROR_MSG = " is an invalid entry. Only alphabetic characters accepted.";
+var LENGTH_ERROR_MSG = "Hotkeys cannot be empty.";
 // Maps OS to extra suggestion for reducing interference with system shortcuts.
 var OS_TO_EXTRA_SUGGESTION = {
     [MAC_OS]: "",
@@ -56,6 +62,7 @@ var HOTKEY_ENTRY_HTML = ' \
         <input class="restore" type="button" value="Restore"></input></td> \
     </tr> \
 ';
+
 
 // If the popup is open, assume the current options page is in the popup. It
 // works because even if you have the options page open on chrome://extensions,
@@ -145,7 +152,7 @@ function addHotkeyEntry() {
     });
 }
 
-function getHotkeyEntrys() {
+function getHotkeyEntries() {
     var hotkeys = [];
     $(HOTKEY_ENTRY_ROWS_SELECTOR).not("." + DELETED_CLASS).each(function() {
         var jq_this = $(this);
@@ -247,7 +254,8 @@ function restoreHotkeyEntrys(hotkeys) {
 // Saves options to chrome.storage.sync.
 function saveOptions() {
     var holdKey = $(HOLD_KEY_SELECTOR).val();
-    var hotkeys = getHotkeyEntrys();
+    var hotkeys = getHotkeyEntries();
+    
     chrome.storage.sync.set({
         [HOLD_KEY_KEY]: holdKey,
         [HOTKEYS_KEY]: hotkeys
@@ -309,8 +317,38 @@ function restoreOptions() {
 }
 
 function markUnsaved() {
-    $(SAVE_BUTTON_SELECTOR).prop(DISABLED, false);
     $(CLOSE_BUTTON_SELECTOR).val(CLOSE_BUTTON_UNSAVED_MSG);
+    // Display warnings and disable save button on invalid hotkey inputs.
+    var unique_hotkeys = new Set();
+    $(WARNING_SELECTOR).hide();
+    $(SAVE_BUTTON_SELECTOR).prop(DISABLED, false);
+    $(HOTKEY_ENTRY_ROWS_SELECTOR).not("." + DELETED_CLASS).find(INPUT_HOTKEY_SELECTOR).each(function() {
+        var jq_this = $(this);
+        var hotkey = jq_this.val();
+        jq_this.addClass(HOTKEY_ENTRY_INVALID_CLASS);
+        // Duplicate checking
+        if (unique_hotkeys.has(hotkey)) {
+            $(WARNING_SELECTOR).show();
+            $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
+            $(WARNING_SELECTOR).html(hotkey + DUPLICATE_ERROR_MSG);
+        }
+        // Length validation
+        else if (hotkey.length == 0) {
+            $(WARNING_SELECTOR).show();
+            $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
+            $(WARNING_SELECTOR).html(LENGTH_ERROR_MSG);
+        }
+        // Character validation
+        else if (!(hotkey.match(ALPHA_REGEX))) {
+            $(WARNING_SELECTOR).show();
+            $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
+            $(WARNING_SELECTOR).html(hotkey + CHARACTER_ERROR_MSG);
+        }
+        else {
+            jq_this.removeClass(HOTKEY_ENTRY_INVALID_CLASS);
+        }
+        unique_hotkeys.add(hotkey);
+    });
 }
 
 // If there are unsaved changes, gives the user a confirmation dialog
