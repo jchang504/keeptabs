@@ -55,3 +55,14 @@ td.checkbox {
 #advanced {
     display: none;
 }
+
+#bottom_bar {
+    /* TODO: 
+     */
+}
+
+#warning {
+    display: none;
+    color: red;
+    font-weight: bold;
+}
