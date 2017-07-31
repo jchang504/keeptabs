@@ -22,6 +22,7 @@ var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
 var SAVE_BUTTON_SELECTOR = '#save';
 var CLOSE_BUTTON_SELECTOR = '#close';
+var WARNING_SELECTOR = '#warning';
 var OPEN_ADVANCED_SELECTOR = "#open_advanced > a";
 var ADVANCED_SELECTOR = "#advanced";
 var HOLD_KEY_SELECTOR = '#hold_key';
@@ -33,6 +34,9 @@ var DISABLED = 'disabled';
 var UNSAVED_WARNING_MSG = "You may have unsaved changes. Are you sure you want to close without saving them?";
 var CLOSE_BUTTON_SAVED_MSG = "Close";
 var CLOSE_BUTTON_UNSAVED_MSG = "Close (drops unsaved changes)";
+var DUPLICATE_ERROR_MSG = " is already being used as a hotkey.";
+var CHARACTER_ERROR_MSG = " is an invalid entry. Only alphabetic characters accepted.";
+var LENGTH_ERROR_MSG = "Hotkey input not detected.";
 // Maps OS to extra suggestion for reducing interference with system shortcuts.
 var OS_TO_EXTRA_SUGGESTION = {
     [MAC_OS]: "",
@@ -56,6 +60,13 @@ var HOTKEY_ENTRY_HTML = ' \
         <input class="restore" type="button" value="Restore"></input></td> \
     </tr> \
 ';
+
+var ALPHA_REGEX = /^[A-Za-z]+$/;
+var EMPTY = 'empty';
+var DUPLICATE = 'duplicate';
+var NON_LETTER = 'non-letter';
+var GOOD = 'good';
+
 
 // If the popup is open, assume the current options page is in the popup. It
 // works because even if you have the options page open on chrome://extensions,
@@ -128,6 +139,10 @@ function addHotkeyEntry() {
         jq_hotkey_entry_row.find(HOTKEY_ENTRY_RESTORE_SELECTOR).show();
         jq_hotkey_entry_row.addClass(DELETED_CLASS);
         markUnsaved();
+        // Remove possible warnings from invalid hotkey inputs.
+        $(WARNING_SELECTOR).hide();
+        $(this).css('background-color', 'white');
+        $(SAVE_BUTTON_SELECTOR).prop(DISABLED, false);
     });
     // Un-disable the row when restore is clicked.
     jq_hotkey_entry_row.find(HOTKEY_ENTRY_RESTORE_SELECTOR).click(function() {
@@ -145,7 +160,7 @@ function addHotkeyEntry() {
     });
 }
 
-function getHotkeyEntrys() {
+function getHotkeyEntries() {
     var hotkeys = [];
     $(HOTKEY_ENTRY_ROWS_SELECTOR).not("." + DELETED_CLASS).each(function() {
         var jq_this = $(this);
@@ -247,7 +262,8 @@ function restoreHotkeyEntrys(hotkeys) {
 // Saves options to chrome.storage.sync.
 function saveOptions() {
     var holdKey = $(HOLD_KEY_SELECTOR).val();
-    var hotkeys = getHotkeyEntrys();
+    var hotkeys = getHotkeyEntries();
+    
     chrome.storage.sync.set({
         [HOLD_KEY_KEY]: holdKey,
         [HOTKEYS_KEY]: hotkeys
@@ -308,9 +324,57 @@ function restoreOptions() {
     });
 }
 
+function verifyHotkeyInput(hotkey) {
+    // Duplicate checking
+    var hotkeys = getHotkeyEntries();
+    var duplicates = -1;
+    for (i = 0; i < hotkeys.length; i++) {
+        if (hotkeys[i].hotkey == hotkey) {
+            duplicates += 1;
+        }
+        if (duplicates > 0) {
+            return DUPLICATE;
+        }
+    }
+    // Length validation
+    if (hotkey.length == 0) {
+        return EMPTY;
+    }
+    // Character validation
+    else if (!(hotkey.match(ALPHA_REGEX))) {
+        return NON_LETTER;
+    }
+    return GOOD;
+}
+
 function markUnsaved() {
-    $(SAVE_BUTTON_SELECTOR).prop(DISABLED, false);
     $(CLOSE_BUTTON_SELECTOR).val(CLOSE_BUTTON_UNSAVED_MSG);
+    
+    // Display warnings and disable save button on invalid hotkey inputs.
+    $(INPUT_HOTKEY_SELECTOR).each(function() {
+        var jq_this = $(this);
+        var hotkey = jq_this.val();
+        var hotkeyVerificationStatus = verifyHotkeyInput(hotkey);
+        if (hotkeyVerificationStatus == GOOD) {
+            $(WARNING_SELECTOR).hide();
+            $(this).css('background-color', 'white');
+            $(SAVE_BUTTON_SELECTOR).prop(DISABLED, false);
+        }
+        else {
+            $(WARNING_SELECTOR).show();
+            $(SAVE_BUTTON_SELECTOR).prop(DISABLED, true);
+            $(this).css('background-color', 'pink');
+            if (hotkeyVerificationStatus == DUPLICATE) {
+                $(WARNING_SELECTOR).html(hotkey + DUPLICATE_ERROR_MSG);
+            }
+            else if (hotkeyVerificationStatus == NON_LETTER) {
+                $(WARNING_SELECTOR).html(hotkey + CHARACTER_ERROR_MSG);
+            }
+            else if (hotkeyVerificationStatus == EMPTY) {
+                $(WARNING_SELECTOR).html(LENGTH_ERROR_MSG);
+            }
+        }
+    });
 }
 
 // If there are unsaved changes, gives the user a confirmation dialog
