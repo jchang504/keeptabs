@@ -20,8 +20,8 @@ var OVERLAY_HOLDING_CLASS = "holding";
 var OVERLAY_IMG_SELECTOR = "#overlay > img";
 var OVERLAY_SPAN_SELECTOR = "#overlay > span";
 var OVERLAY_EXPAND_ANIMATION = {"height": "100%", "width": "100%"};
-var OVERLAY_EXPAND_TIME = 200;
-var OVERLAY_ANIMATION_UNDO = {"height": "initial", "width": "initial"};
+var OVERLAY_ANIMATION_TIME = 150;
+var OVERLAY_ANIMATION_UNDO = {"height": "100px", "width": "100px"};
 var SEARCH_BAR_SELECTOR = "#search_bar";
 var SEARCH_RESULTS_SELECTOR = "#search_results";
 // End tightly coupled part with overlay.css, tab_search.css.
@@ -60,7 +60,7 @@ function setHotkeyString(current_hotkey) {
 function openTabSearch() {
     in_tab_search = true;
     setHoldKeyStatus(false);
-    $(OVERLAY_SELECTOR).animate(OVERLAY_EXPAND_ANIMATION, OVERLAY_EXPAND_TIME,
+    $(OVERLAY_SELECTOR).animate(OVERLAY_EXPAND_ANIMATION, OVERLAY_ANIMATION_TIME,
             function() {
         $(FUZZY_INPUT_SELECTOR).val("");
         populate();
@@ -75,7 +75,7 @@ function closeTabSearch() {
     in_tab_search = false;
     $(OVERLAY_SELECTOR).hide();
     $(SEARCH_BAR_SELECTOR + ", " + SEARCH_RESULTS_SELECTOR).hide();
-    $(OVERLAY_SELECTOR).css(OVERLAY_ANIMATION_UNDO);
+    $(OVERLAY_SELECTOR).animate(OVERLAY_ANIMATION_UNDO, OVERLAY_ANIMATION_TIME);
 }
 
 function sendHotkeyMessage(hotkey) {
