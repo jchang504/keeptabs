@@ -18,7 +18,10 @@
     line-height: initial;
     font-size: initial;
     font-family: helvetica, sans-serif;
-    z-index: 103;  /* > 102 necessary for google.com */
+    /* 2 billion (yes, it's really necessary)
+     * Current record-holder to beat: the menu and search bars on
+     * www.youtube.com with z-index 1,999,999,999 */
+    z-index: 2000000000;
 }
 
 #overlay > img {
