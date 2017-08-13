@@ -180,3 +180,8 @@ function LOG_ERROR(msg) {
         console.log("E: " + msg);
     }
 }
+function ASSERT(condition, msg) {
+    if (!condition) {
+        LOG_ERROR(msg);
+    }
+}

@@ -78,12 +78,14 @@ function closeCurrentTab() {
 
 function updateHoldKey() {
     LOG_INFO("Load hold key and update tabs' content scripts");
-    chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_DEFAULT}, function(items)
+    chrome.storage.sync.get({[HOLD_KEY_KEY]: HOLD_KEY_EMPTY}, function(items)
             {
+        var hold_key = items[HOLD_KEY_KEY];
+        ASSERT(hold_key != HOLD_KEY_EMPTY, "No hold key on options refresh.");
         chrome.tabs.query({}, function(tabs) {
             for (const tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {[UPDATE_HOLD_KEY_MSG]:
-                        items[HOLD_KEY_KEY]});
+                        hold_key});
             }
         });
     });
