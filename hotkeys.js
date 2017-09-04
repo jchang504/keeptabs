@@ -21,7 +21,8 @@ var OVERLAY_IMG_SELECTOR = "#overlay > img";
 var OVERLAY_SPAN_SELECTOR = "#overlay > span";
 var OVERLAY_EXPAND_ANIMATION = {"height": "100%", "width": "100%"};
 var OVERLAY_ANIMATION_TIME = 150;
-var OVERLAY_ANIMATION_UNDO = {"height": "100px", "width": "100px"};
+var OVERLAY_ANIMATION_UNDO = {"height": "6em", "width": "6em"};
+var OVERLAY_INITIAL = {"height": "initial", 'width': "initial"};
 var SEARCH_BAR_SELECTOR = "#search_bar";
 var SEARCH_RESULTS_SELECTOR = "#search_results";
 // End tightly coupled part with overlay.css, tab_search.css.
@@ -76,6 +77,7 @@ function closeTabSearch() {
     $(OVERLAY_SELECTOR).hide();
     $(SEARCH_BAR_SELECTOR + ", " + SEARCH_RESULTS_SELECTOR).hide();
     $(OVERLAY_SELECTOR).animate(OVERLAY_ANIMATION_UNDO, OVERLAY_ANIMATION_TIME);
+    $(OVERLAY_SELECTOR).css(OVERLAY_INITIAL);
 }
 
 function sendHotkeyMessage(hotkey) {
