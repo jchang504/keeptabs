@@ -61,7 +61,7 @@ function setHotkeyString(current_hotkey) {
 function openTabSearch() {
     in_tab_search = true;
     setHoldKeyStatus(false);
-    $(OVERLAY_SELECTOR).animate(OVERLAY_EXPAND_ANIMATION, OVERLAY_ANIMATION_TIME,
+    $(OVERLAY_SELECTOR).animate(OVERLAY_EXPAND_ANIMATION,OVERLAY_ANIMATION_TIME,
             function() {
         $(FUZZY_INPUT_SELECTOR).val("");
         populate();
@@ -76,8 +76,10 @@ function closeTabSearch() {
     in_tab_search = false;
     $(OVERLAY_SELECTOR).hide();
     $(SEARCH_BAR_SELECTOR + ", " + SEARCH_RESULTS_SELECTOR).hide();
-    $(OVERLAY_SELECTOR).animate(OVERLAY_ANIMATION_UNDO, OVERLAY_ANIMATION_TIME);
-    $(OVERLAY_SELECTOR).css(OVERLAY_INITIAL);
+    $(OVERLAY_SELECTOR).animate(OVERLAY_ANIMATION_UNDO, OVERLAY_ANIMATION_TIME,
+            function() {
+        $(OVERLAY_SELECTOR).css(OVERLAY_INITIAL);
+    });
 }
 
 function sendHotkeyMessage(hotkey) {
