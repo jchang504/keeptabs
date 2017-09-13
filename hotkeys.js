@@ -1,7 +1,7 @@
 var BODY_SELECTOR = "body";
 // NOTE: This part tightly coupled with the CSS in overlay.css, tab_search.css.
 var OVERLAY_HTML = '\
-    <div id="overlay">\
+    <div id="keeptabs_overlay">\
         <img>\
         <span></span>\
         <div id="search_bar">\
@@ -15,10 +15,10 @@ var OVERLAY_HTML = '\
             </table>\
         </div>\
     </div>';
-var OVERLAY_SELECTOR = "#overlay";
+var OVERLAY_SELECTOR = "#keeptabs_overlay";
 var OVERLAY_HOLDING_CLASS = "holding";
-var OVERLAY_IMG_SELECTOR = "#overlay > img";
-var OVERLAY_SPAN_SELECTOR = "#overlay > span";
+var OVERLAY_IMG_SELECTOR = "#keeptabs_overlay > img";
+var OVERLAY_SPAN_SELECTOR = "#keeptabs_overlay > span";
 var OVERLAY_EXPAND_ANIMATION = {"height": "100%", "width": "100%"};
 var OVERLAY_EXPAND_TIME = 200;
 var OVERLAY_ANIMATION_UNDO = {"height": "initial", "width": "initial"};

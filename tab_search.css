@@ -1,51 +1,51 @@
-#search_bar, #search_results {
+#keeptabs_overlay #search_bar, #keeptabs_overlay #search_results {
     display: none;
 }
 
-#search_bar > label {
+#keeptabs_overlay #search_bar > label {
     vertical-align: middle;
     color: white;
     font-size: 1.5em;
     margin: 0.5em;
 }
 
-#search_bar > input {
+#keeptabs_overlay #search_bar > input {
     vertical-align: middle;
 }
 
-#search_results {
+#keeptabs_overlay #search_results {
     max-height: 80%;
     overflow: auto;
 }
 
-#search_results a {
+#keeptabs_overlay #search_results a {
     color: rgb(210, 230, 235);
 }
 
-#search_results a:hover {
+#keeptabs_overlay #search_results a:hover {
     text-decoration: none;
     cursor: pointer;
 }
 
-#search_results td {
+#keeptabs_overlay #search_results td {
     padding: 1em;
 }
 
-#search_results p {
+#keeptabs_overlay #search_results p {
     margin-top: 0;
     margin-bottom: 0.25em;
 }
 
-#search_results tr.selected td {
+#keeptabs_overlay #search_results tr.selected td {
     background-color: rgb(39, 73, 93);
 }
 
-.result-title {
+#keeptabs_overlay #search_results .result-title {
     color: white;
     font-size: 1.2em;
 }
 
-.favicon {
+#keeptabs_overlay #search_results .favicon {
     max-height: 1em;
     max-width: 1em;
     vertical-align: middle;

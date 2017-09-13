@@ -1,4 +1,4 @@
-#overlay {
+#keeptabs_overlay {
     /*
      * Centering stuff from
      * https://css-tricks.com/considerations-styling-modal/.
@@ -24,7 +24,7 @@
     z-index: 2000000000;
 }
 
-#overlay > img {
+#keeptabs_overlay > img {
     max-height: 128px;  /* Source image height is 128 */
     height: 5em !important;
     margin: 0;
@@ -35,7 +35,7 @@
     vertical-align: middle;
 }
 
-#overlay > span {
+#keeptabs_overlay > span {
     font-size: 2em;
     color: white;
     /*
