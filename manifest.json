@@ -20,7 +20,10 @@
         "matches": ["<all_urls>"],
         "js": ["jquery-3.2.1.min.js", "shared_utils.js", "hotkeys.js", "fuse.js", "tab_search.js"],
         "css": ["overlay.css", "tab_search.css"],
-        "run_at": "document_start"
+        "run_at": "document_start",
+        // Next two lines are necessary for content script to run in iframes.
+        "match_about_blank": true,
+        "all_frames": true
     }],
     "web_accessible_resources": [
         "icons/icon128.png"
