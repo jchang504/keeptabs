@@ -33,12 +33,8 @@ function navigateToTab(tab_id, window_id) {
 
 // Create a new tab of the url (and navigate to it). Also used for tab search.
 function createNewTab(url) {
-    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-        function (tabs) {
-            LOG_INFO("Create new tab of: " + url);
-            chrome.tabs.create({[URL]: url});
-        }
-    );
+    LOG_INFO("Create new tab of: " + url);
+    chrome.tabs.create({[URL]: url});
 }
 
 /* direction: -1 for left, 1 for right
@@ -70,10 +66,8 @@ function leftRightNavOrMove(direction, move) {
 
 function closeCurrentTab() {
     LOG_INFO("Close current tab");
-    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
-        function(currentTab) {
-            chrome.tabs.remove(currentTab[0].id);
-        });
+    var current_tab_id = tab_history[current_tab_index];
+    chrome.tabs.remove(current_tab_id);
 }
 
 function updateHoldKey() {
