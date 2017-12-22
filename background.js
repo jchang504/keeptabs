@@ -37,6 +37,7 @@ function createNewTab(url) {
     chrome.tabs.create({[URL]: url});
 }
 
+
 /* direction: -1 for left, 1 for right
  * move: true for moving tab left/right, false for navigating left/right
  */
