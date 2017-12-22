@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>KeepTabs Pop-Up</title>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+    <h1>Keep this Tab</h1>
+    <div class="center" id="add">
+        <form class="form-horizontal" id="options">
+            <label class="label" for="usr">Enter hotkey:</label>
+            <input type="text">
+            <input type="button" class="save" value="SAVE">
+        </form>
+    </div>
+
+    <div id="domain">
+        <h4>Will open/find:</h4>
+        <form class="url">
+            <input type="text" value="www.google.com/">
+            <input type="button" value="Edit">
+        </form>
+    </div>
+
+    <footer>
+        <a href="popup1.html">
+        <button type="button" id="switch">See Full List<i class="material-icons">chevron_right</i></button>
+        </a>
+    </footer>
+
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="shared_utils.js"></script>
+    <script src="options.js"></script>
+</body>
+</html>
