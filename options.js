@@ -21,6 +21,7 @@ var DELETED_CLASS = "deleted";
 var HOTKEY_ENTRY_INVALID_CLASS = 'invalid';
 var OPTIONS_FORM_SELECTOR = '#options';
 var ADD_HOTKEY_ENTRY_BUTTON_SELECTOR = '#add_hotkey';
+var ADD_HOTKEY_FOR_CURRENT_TAB_BUTTON_SELECTOR = '#add_hotkey_for_current_tab';
 var SAVE_BUTTON_SELECTOR = '#save';
 var CLOSE_BUTTON_SELECTOR = '#close';
 var WARNING_SELECTOR = '#warning';
@@ -77,8 +78,7 @@ function matchPrefixMirrorTarget() {
     jq_target.parent().parent().find(INPUT_MATCH_PREFIX_SELECTOR).val(jq_target.val());
 }
 
-// Disables the match prefix of the row and sets it to mirror the target. Also
-// unchecks "Always open in new tab", since the two are mutually exclusive.
+// Disables the match prefix of the row and sets it to mirror the target.
 function setMatchPrefixToTarget(jq_hotkey_entry_row) {
     var jq_target = jq_hotkey_entry_row.find(INPUT_TARGET_SELECTOR);
     var jq_match_prefix = jq_hotkey_entry_row.find(INPUT_MATCH_PREFIX_SELECTOR);
@@ -150,6 +150,24 @@ function addHotkeyEntry() {
         jq_hotkey_entry_row.removeClass(DELETED_CLASS);
         markUnsaved();
     });
+}
+
+// Adds a new hotkey entry and prefills it with the current tab's URL,
+// defaulting to "use target as match prefix", and focuses the hotkey field.
+function addHotkeyEntryForCurrentTab() {
+    chrome.tabs.query({[CURRENT_WINDOW]: true, [ACTIVE]: true},
+        function(tabs) {
+            var currentTabUrl = tabs[0].url;
+            addHotkeyEntry();
+            var jq_hotkey_entry_row = $(HOTKEY_ENTRY_LAST_ROW_SELECTOR);
+            jq_hotkey_entry_row.find(INPUT_TARGET_SELECTOR).val(currentTabUrl);
+            jq_hotkey_entry_row.find(INPUT_USE_TARGET_SELECTOR).prop(CHECKED,
+                true);
+            setMatchPrefixToTarget(jq_hotkey_entry_row);
+            jq_hotkey_entry_row.find(INPUT_HOTKEY_SELECTOR).focus();
+            markUnsaved();
+        }
+    );
 }
 
 function getHotkeyEntries() {
@@ -382,6 +400,10 @@ $(document).ready(function() {
 
     // Set up add button.
     $(ADD_HOTKEY_ENTRY_BUTTON_SELECTOR).click(addHotkeyEntry);
+
+    // Set up add hotkey for current tab button.
+    $(ADD_HOTKEY_FOR_CURRENT_TAB_BUTTON_SELECTOR).click(
+            addHotkeyEntryForCurrentTab);
 
     // Set up save button.
     $(OPTIONS_FORM_SELECTOR).submit(saveOptions);
