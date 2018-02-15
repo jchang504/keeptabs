@@ -3,22 +3,16 @@ var BODY_SELECTOR = "body";
 var OVERLAY_HTML = '\
     <div id="keeptabs_overlay">\
         <div id="top">\
-            <img src="https://openclipart.org/download/215361/shadowed-news-icon.svg">\
+            <img src=#>\
            <input type="text">\
         </div>\
         <div id="menu">\
             <table>\
                 <tr>\
-                    <th>Hotkey</th>\
-                    <th>URL</th>\
                 </tr>\
                 <tr>\
-                    <td>g</td>\
-                    <td>www.google.com/</td>\
                 </tr>\
                 <tr>\
-                    <td>g</td>\
-                    <td>www.google.com/</td>\
                 </tr>\
             </table>\
         </div>\
