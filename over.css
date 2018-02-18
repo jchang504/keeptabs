@@ -1,0 +1,64 @@
+body {
+    box-sizing: border-box;
+}
+
+#top {
+    text-align: center;
+    margin: auto;
+}
+
+#top img {
+    display: inline-block;
+    float: left;
+    width: 60px;
+    height: 60px;
+}
+
+#top input[type=text] {
+    width: 75px;
+    height: 75px;
+    text-align: center;
+    font-size: 5em;
+    border:none;
+    border-bottom: 2px solid black;
+    outline:none;
+    position: relative;
+    left: -30px;
+}
+
+table {
+    display: inline;
+    text-align: center;
+    margin: auto;
+}
+
+#menu {
+    text-align: center;
+    margin:auto;
+    vertical-align: bottom;
+    position: relative;
+    top: 75px;
+}
+
+#menu th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+}
+
+#menu td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    background-color: white;
+    padding:10px;
+}
+
+#menu td: nth-child(even) {
+    display: inline;
+    width: auto;
+}
+
+#menu tr {
+    margin:5px;
+    margin-bottom:10px;
+}

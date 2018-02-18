@@ -2,16 +2,18 @@ var BODY_SELECTOR = "body";
 // NOTE: This part tightly coupled with the CSS in overlay.css, tab_search.css.
 var OVERLAY_HTML = '\
     <div id="keeptabs_overlay">\
-        <img>\
-        <span></span>\
-        <div id="search_bar">\
-            <label for="fuzzy_input">Tab Search</label>\
-            <input type="text" id="fuzzy_input" placeholder="google.com">\
+        <div id="top">\
+            <img src=#>\
+           <input type="text">\
         </div>\
-        <div id="search_results">\
+        <div id="menu">\
             <table>\
-                <tbody>\
-                </tbody>\
+                <tr>\
+                </tr>\
+                <tr>\
+                </tr>\
+                <tr>\
+                </tr>\
             </table>\
         </div>\
     </div>';

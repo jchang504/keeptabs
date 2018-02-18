@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>KeepTabs List</title>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+    <h1>My KeepTabs</h1>
+    <div class=table id="add">
+        <table>
+            <tr>
+                <th>Hotkey</th>
+                <th>URL</th>
+                <th><input type="button" class="save" value="SAVE"></th>
+            </tr>
+            <tr>
+            <!--use javascript to make a table with variable # rows-->
+                <form id="list">
+                    <td>
+                        <input type="text" id="hotkey">
+                    </td>
+                    <td>
+                        <input type="text" id="url">
+                    </td>
+                    <td>
+                        <button type="button"><i class="material-icons">expand_more</i></button>
+                    </td>
+                </form>
+            </tr>
+        </table>
+    </div>
+
+    <div id="domain">
+        <input type="button" value="Add new KeepTab">
+    </div>
+
+    <footer>
+        <a href="popup.html">
+        <button type="button" id="switch"><i class="material-icons">chevron_left</i>Go Back</button>
+        </a>
+    </footer>
+
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="shared_utils.js"></script>
+    <script src="options.js"></script>
+</body>
+</html>
